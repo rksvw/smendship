@@ -5,6 +5,7 @@ import { pool } from "../config/db.js";
 import prisma from "../config/prismaConfig.js"
 // import { v4 as uuidv4 } from "uuid";
 
+
 const resolvers = {
   Query: {
     hello: () => "Hello World! 🌍",
