@@ -2,9 +2,13 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { pool } from "../config/db.js";
-import prisma from "../config/prismaConfig.js"
+import {
+  AuthenticationError,
+  UserInputError,
+  ValidationError,
+} from "apollo-server-express";
+import prisma from "../config/prismaConfig.js";
 // import { v4 as uuidv4 } from "uuid";
-
 
 const resolvers = {
   Query: {
@@ -12,44 +16,76 @@ const resolvers = {
   },
   Mutation: {
     // Mutation is like a router for GraphQL
-    signup: async (bananananan, { name, email, password }) => {
+    signup: async (_, { name, email, password }) => {
+      if (
+        !name ||
+        !email ||
+        !password ||
+        name === "" ||
+        email === "" ||
+        password === ""
+      ) {
+        throw new UserInputError(
+          "Invalid User Credentials! Please fill required Fields"
+        );
+      }
+
       const hashedPassword = await bcrypt.hash(password, 10);
-      const newUser = await prisma.user.create({
-        data: {name, email, password: hashedPassword}
-      })
-      const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET);
-      return {
-        token,
-        user: {
-          id: newUser.id,
-          name: newUser.name,
-          email: newUser.email,
-          created_at: newUser.createdAt
-        },
-      };
+      try {
+        const newUser = await prisma.user.create({
+          data: { name, email, password: hashedPassword },
+        });
+
+        const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET);
+
+        return {
+          token,
+          user: {
+            id: newUser.id,
+            name: newUser.name,
+            email: newUser.email,
+            createdAt: newUser.createdAt,
+          },
+        };
+      } catch (err) {
+        throw new ValidationError("User already Exists!");
+      }
     },
-    login: async (bananananan, { email, password }) => {
-      const reqUser = await prisma.user.findUnique({
-        where: {
-          email
+    login: async (_, { email, password }) => {
+      if (!email || !password || email === "" || password === "") {
+        throw new UserInputError(
+          "Invalid User Credentials! Please fill required Fields"
+        );
+      }
+
+      try {
+        const reqUser = await prisma.user.findUnique({
+          where: {
+            email,
+          },
+        });
+
+        if (!reqUser) throw new ValidationError("Invalid User");
+
+        const valid = await bcrypt.compare(password, reqUser.password);
+        if (!valid) throw new ValidationError("Invalid Password");
+
+        const token = jwt.sign({ userId: reqUser.id }, process.env.JWT_SECRET);
+        if (!token) {
+          throw new AuthenticationError("UnAuthentic Account");
         }
-      })
-
-      if (!reqUser) throw new Error("User not found");
-
-      const valid = await bcrypt.compare(password, reqUser.password);
-      if (!valid) throw new Error("Invalid password");
-
-      const token = jwt.sign({ userId: reqUser.id }, process.env.JWT_SECRET);
-      return {
-        token,
-        user: {
-          id: reqUser.id,
-          name: reqUser.name,
-          email: reqUser.email,
-          created_at: reqUser.createdAt,
-        },
-      };
+        return {
+          token,
+          user: {
+            id: reqUser.id,
+            name: reqUser.name,
+            email: reqUser.email,
+            createdAt: reqUser.createdAt,
+          },
+        };
+      } catch (err) {
+        throw new AuthenticationError("UnAuthorized Account");
+      }
     },
   },
 };
