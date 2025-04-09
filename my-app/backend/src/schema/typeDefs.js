@@ -6,7 +6,7 @@ const typeDefs = gql`
     id: ID!
     name: String!
     email: String!
-    created_at: String!
+    createdAt: String!
   }
 
   type AuthPayload {
