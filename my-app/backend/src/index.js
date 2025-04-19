@@ -7,30 +7,27 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 
-try {
-  dotenv.config();
-  const app = express();
-  app.use(cors());
+dotenv.config();
+const app = express();
+app.use(cors());
 
-  connectDB();
+connectDB();
 
-  const server = new ApolloServer({
-    typeDefs,
-    resolvers,
-    context: ({ req }) => {
-      const token = req.headers.authorization || "";
-      return { token };
-    },
-  });
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: ({ req }) => {
+    const authHeader = req.headers.authorization || "";
+    const token = authHeader.startsWith("Bearer ") ? authHeader.split(' ')[1] : '';
+    return { token };
+  },
+});
 
-  await server.start();
-  server.applyMiddleware({ app });
+await server.start();
+server.applyMiddleware({ app });
 
-  app.listen({ port: process.env.PORT || 4000 }, () => {
-    console.log(
-      `🚀 Server ready at http://localhost:${process.env.PORT}${server.graphqlPath}`
-    );
-  });
-} catch (err) {
-  throw new Error("Server Error 500");
-}
+app.listen({ port: process.env.PORT || 4000 }, () => {
+  console.log(
+    `🚀 Server ready at http://localhost:${process.env.PORT}${server.graphqlPath}`
+  );
+});

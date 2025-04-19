@@ -70,7 +70,7 @@ const resolvers = {
         const valid = await bcrypt.compare(password, reqUser.password);
         if (!valid) throw new ValidationError("Invalid Password");
 
-        const token = jwt.sign({ userId: reqUser.id }, process.env.JWT_SECRET);
+        const token = jwt.sign({ userId: reqUser.id }, process.env.JWT_SECRET, {expiresIn: '7d'});
         if (!token) {
           throw new AuthenticationError("UnAuthentic Account");
         }
@@ -87,7 +87,40 @@ const resolvers = {
         throw new AuthenticationError("UnAuthorized Account");
       }
     },
+    createpost: async (_, { title, content }, context) => {
+      const userId = getUserIdFromToken(context);
+      if (!userId) throw new AuthenticationError("Unauthorized");
+
+      const post = await prisma.post.create({
+        data: {
+          title,
+          content,
+          authorId: userId,
+        },
+        include: {
+          author: true,
+        },
+      });
+      console.log(userId, title, content)
+      return {
+        posts: {
+          id: userId,
+          title,
+          content
+        }
+      };
+    },
   },
 };
+
+function getUserIdFromToken(context) {
+  const token = context.token;
+  try {
+    const verifiedToken = jwt.verify(token, process.env.JWT_SECRET);
+    return verifiedToken.userId;
+  } catch (err) {
+    return null;
+  }
+}
 
 export default resolvers;
