@@ -10,7 +10,7 @@ datasource db {
 model Post {
   id        String   @id @default(uuid()) @db.Uuid
   title     String
-  category  String?
+  category  Category  @default(UNDEFINED)
   content   String
   author    User     @relation(fields: [authorId], references: [id])
   authorId  String   @db.Uuid
@@ -30,4 +30,12 @@ model User {
 enum Role {
   USER
   ADMIN
+}
+
+enum Category {
+  UNDEFINED
+  PROGRAMMING
+  GAMES
+  ANIME
+  MOVIES
 }

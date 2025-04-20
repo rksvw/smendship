@@ -24,17 +24,29 @@ const typeDefs = gql`
   }
 
   type PostPayload {
-  posts: Post!
+    post: Post!
+  }
+
+  type Message {
+  message: String
   }
 
   type Query {
     hello: String!
+    getpost(id: String!): PostPayload
   }
 
   type Mutation {
     signup(name: String!, email: String!, password: String!): AuthPayload
     login(email: String!, password: String!): AuthPayload
-    createpost(title: String!, content: String!): PostPayload
+    createpost(title: String!, content: String!, category: String!): PostPayload
+    updatepost(
+      id: String!
+      title: String
+      content: String
+      category: String
+    ): PostPayload
+    deletepost(id: String!): Message
   }
 `;
 
