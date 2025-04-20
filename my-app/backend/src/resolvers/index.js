@@ -13,6 +13,19 @@ import prisma from "../config/prismaConfig.js";
 const resolvers = {
   Query: {
     hello: () => "Hello World! 🌍",
+    getpost: async (_, { id }, context) => {
+      const userId = getUserIdFromToken(context);
+      if (!userId) throw new AuthenticationError("Unauthorized");
+      const post = await prisma.post.findUnique({
+        where: {
+          id,
+        },
+      });
+
+      return {
+        post,
+      };
+    },
   },
   Mutation: {
     // Mutation is like a router for GraphQL
@@ -70,7 +83,9 @@ const resolvers = {
         const valid = await bcrypt.compare(password, reqUser.password);
         if (!valid) throw new ValidationError("Invalid Password");
 
-        const token = jwt.sign({ userId: reqUser.id }, process.env.JWT_SECRET);
+        const token = jwt.sign({ userId: reqUser.id }, process.env.JWT_SECRET, {
+          expiresIn: "7d",
+        });
         if (!token) {
           throw new AuthenticationError("UnAuthentic Account");
         }
@@ -87,7 +102,78 @@ const resolvers = {
         throw new AuthenticationError("UnAuthorized Account");
       }
     },
+    createpost: async (_, { title, content, category }, context) => {
+      const userId = getUserIdFromToken(context);
+      if (!userId) throw new AuthenticationError("Unauthorized");
+
+      const post = await prisma.post.create({
+        data: {
+          title,
+          content,
+          category,
+          authorId: userId,
+        },
+        include: {
+          author: true,
+        },
+      });
+      return {
+        post: {
+          id: userId,
+          title,
+          content,
+          category,
+        },
+      };
+    },
+    updatepost: async (_, { id, title, content, category }, context) => {
+      const userId = getUserIdFromToken(context);
+      if (!userId) throw new AuthenticationError("Unauthorized");
+
+      const data = {};
+      if (title) {
+        data["title"] = title;
+      }
+      if (content) {
+        data["content"] = content;
+      }
+
+      if (category) {
+        data["category"] = category;
+      }
+
+      const post = await prisma.post.update({
+        where: { id },
+        data,
+      });
+      console.log(post);
+      return {
+        post,
+      };
+    },
+    deletepost: async (_, { id }, context) => {
+      const userId = getUserIdFromToken(context);
+      if (!userId) throw new AuthenticationError("Unauthorized");
+
+      const post = await prisma.post.delete({
+        where: { id },
+      });
+
+      return {
+        message: "Post deleted Successfully",
+      };
+    },
   },
 };
+
+function getUserIdFromToken(context) {
+  const token = context.token;
+  try {
+    const verifiedToken = jwt.verify(token, process.env.JWT_SECRET);
+    return verifiedToken.userId;
+  } catch (err) {
+    return null;
+  }
+}
 
 export default resolvers;
