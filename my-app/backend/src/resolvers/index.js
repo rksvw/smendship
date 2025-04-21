@@ -200,10 +200,16 @@ const resolvers = {
       if (!userId) throw new AuthenticationError("Unauthorized");
 
       const isAdmin = checkIsAdmin(context);
-      if (isAdmin.toLowerCase() === "user")
+      if (
+        isAdmin === undefined ||
+        isAdmin === null ||
+        isAdmin === "" ||
+        !isAdmin ||
+        isAdmin.toLowerCase() === "user"
+      )
         throw new AuthenticationError("Unauthorized");
 
-      const user = await prisma.user.delete({
+      await prisma.user.delete({
         where: { id },
       });
 
@@ -224,6 +230,17 @@ function getUserIdFromToken(context) {
   try {
     const verifiedToken = jwt.verify(token, process.env.JWT_SECRET);
     return verifiedToken.userId;
+  } catch (err) {
+    return null;
+  }
+}
+
+function checkIsAdmin(context) {
+  const token = context.token;
+  try {
+    const verifiedToken = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(verifiedToken.role);
+    return verifiedToken.role;
   } catch (err) {
     return null;
   }
