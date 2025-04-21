@@ -18,7 +18,9 @@ const server = new ApolloServer({
   resolvers,
   context: ({ req }) => {
     const authHeader = req.headers.authorization || "";
-    const token = authHeader.startsWith("Bearer ") ? authHeader.split(' ')[1] : '';
+    const token = authHeader.startsWith("Bearer ")
+      ? authHeader.split(" ")[1]
+      : "";
     return { token };
   },
 });
