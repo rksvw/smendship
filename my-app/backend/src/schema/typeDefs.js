@@ -28,7 +28,7 @@ const typeDefs = gql`
   }
 
   type Message {
-  message: String
+    message: String
   }
 
   type Query {
@@ -39,6 +39,8 @@ const typeDefs = gql`
   type Mutation {
     signup(name: String!, email: String!, password: String!): AuthPayload
     login(email: String!, password: String!): AuthPayload
+    updateprofile(name: String, email: String): AuthPayload
+    deleteuser(id: String!): Message
     createpost(title: String!, content: String!, category: String!): PostPayload
     updatepost(
       id: String!

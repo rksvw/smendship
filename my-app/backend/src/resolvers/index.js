@@ -49,7 +49,10 @@ const resolvers = {
           data: { name, email, password: hashedPassword },
         });
 
-        const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET);
+        const token = jwt.sign(
+          { userId: newUser.id, role: newUser.role },
+          process.env.JWT_SECRET
+        );
 
         return {
           token,
@@ -83,9 +86,13 @@ const resolvers = {
         const valid = await bcrypt.compare(password, reqUser.password);
         if (!valid) throw new ValidationError("Invalid Password");
 
-        const token = jwt.sign({ userId: reqUser.id }, process.env.JWT_SECRET, {
-          expiresIn: "7d",
-        });
+        const token = jwt.sign(
+          { userId: reqUser.id, role: reqUser.role },
+          process.env.JWT_SECRET,
+          {
+            expiresIn: "7d",
+          }
+        );
         if (!token) {
           throw new AuthenticationError("UnAuthentic Account");
         }
@@ -146,7 +153,6 @@ const resolvers = {
         where: { id },
         data,
       });
-      console.log(post);
       return {
         post,
       };
@@ -163,8 +169,55 @@ const resolvers = {
         message: "Post deleted Successfully",
       };
     },
+    updateprofile: async (_, { name, email }, context) => {
+      const userId = getUserIdFromToken(context);
+      if (!userId) throw new AuthenticationError("Unauthorized");
+
+      const data = {};
+
+      if (name) {
+        data["name"] = name;
+      }
+
+      if (email) {
+        data["email"] = email;
+      }
+
+      const user = await prisma.user.update({
+        where: { id: userId },
+        data,
+      });
+
+      const token = getToken(context);
+
+      return {
+        token,
+        user,
+      };
+    },
+    deleteuser: async (_, { id }, context) => {
+      const userId = getUserIdFromToken(context);
+      if (!userId) throw new AuthenticationError("Unauthorized");
+
+      const isAdmin = checkIsAdmin(context);
+      if (isAdmin.toLowerCase() === "user")
+        throw new AuthenticationError("Unauthorized");
+
+      const user = await prisma.user.delete({
+        where: { id },
+      });
+
+      return {
+        message: "User removed Successfully",
+      };
+    },
   },
 };
+
+function getToken(context) {
+  const token = context.token;
+  return token;
+}
 
 function getUserIdFromToken(context) {
   const token = context.token;
