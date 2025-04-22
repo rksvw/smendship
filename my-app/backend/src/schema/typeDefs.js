@@ -11,6 +11,13 @@ const typeDefs = gql`
     createdAt: String!
   }
 
+  type Comment {
+    id: ID!
+    comment: String!
+    authorId: String!
+    postId: String!
+  }
+
   type User {
     id: ID!
     name: String!
@@ -31,9 +38,20 @@ const typeDefs = gql`
     message: String
   }
 
+  type CommentPayload {
+    token: String!
+    mycomment: Comment!
+  }
+
+  type CommentsPayload {
+    token: String!
+    mycomment: [Comment!]!
+  }
+
   type Query {
     hello: String!
     getpost(id: String!): PostPayload
+    getcomments(postId: String!): CommentsPayload
   }
 
   type Mutation {
@@ -49,6 +67,9 @@ const typeDefs = gql`
       category: String
     ): PostPayload
     deletepost(id: String!): Message
+    createcomment(comment: String!, postId: String!): CommentPayload
+    updatecomment(id: String!, comment: String!): CommentPayload
+    deletecomment(id: String!): Message
   }
 `;
 

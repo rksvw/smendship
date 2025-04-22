@@ -26,6 +26,20 @@ const resolvers = {
         post,
       };
     },
+    getcomments: async (_, { postId }, context) => {
+      const token = getToken(context);
+      if (!token) throw new AuthenticationError("Priveledged violation!");
+
+      const mycomment = await prisma.comment.findMany({
+        where: {
+          postId,
+        },
+      });
+      return {
+        token,
+        mycomment,
+      };
+    },
   },
   Mutation: {
     // Mutation is like a router for GraphQL
@@ -189,6 +203,7 @@ const resolvers = {
       });
 
       const token = getToken(context);
+      if (!token) throw new AuthenticationError("Previledged violation");
 
       return {
         token,
@@ -215,6 +230,58 @@ const resolvers = {
 
       return {
         message: "User removed Successfully",
+      };
+    },
+    createcomment: async (_, { comment, postId }, context) => {
+      const authorId = getUserIdFromToken(context);
+      if (!authorId) throw new AuthenticationError("Unauthorized");
+
+      const token = getToken(context);
+      if (!token) throw new AuthenticationError("Previledged violation!");
+
+      const mycomment = await prisma.comment.create({
+        data: { comment, postId, authorId },
+      });
+
+      return {
+        token,
+        mycomment,
+      };
+    },
+    updatecomment: async (_, { comment, id }, context) => {
+      const authorId = getUserIdFromToken(context);
+      if (!authorId) throw new AuthenticationError("Unauthorized");
+
+      const token = getToken(context);
+      if (!token) throw new AuthenticationError("Priveledged violation!");
+
+      const mycomment = await prisma.comment.update({
+        where: {
+          id,
+        },
+        data: {
+          comment,
+        },
+      });
+
+      return {
+        token,
+        mycomment,
+      };
+    },
+    deletecomment: async (_, { id }, context) => {
+      const authorId = getUserIdFromToken(context);
+      if (!authorId) throw new AuthenticationError("Unauthorized");
+
+      const token = getToken(context);
+      if (!token) throw new AuthenticationError("Priveledged violation!");
+
+      await prisma.comment.delete({
+        where: { id },
+      });
+
+      return {
+        message: "Comment deleted Successfully!",
       };
     },
   },
