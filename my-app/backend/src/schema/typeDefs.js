@@ -75,6 +75,7 @@ const typeDefs = gql`
     createcomment(comment: String!, postId: String!): CommentPayload
     updatecomment(id: String!, comment: String!): CommentPayload
     deletecomment(id: String!): Message
+    likecomment(postId: ID!, commentId: ID!): LikeResponse
   }
 `;
 

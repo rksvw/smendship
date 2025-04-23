@@ -341,6 +341,68 @@ const resolvers = {
         message: "Comment deleted Successfully!",
       };
     },
+    likecomment: async (_, { postId, commentId }, context) => {
+      const userId = getUserIdFromToken(context);
+      if (!userId) throw new AuthenticationError("Unauthorized");
+
+      try {
+        const existing = await prisma.commentLike.findUnique({
+          where: {
+            userId_postId_commentId: { userId, postId, commentId },
+          },
+        });
+
+        if (existing) {
+          const dislike = await prisma.commentLike.delete({
+            where: { id: existing.id },
+          });
+
+          const likeCount = await prisma.commentLike.count({
+            where: {
+              commentId,
+            },
+          });
+
+          const setCommentLike = await prisma.comment.update({
+            where: {
+              id: commentId,
+            },
+            data: { likeCount },
+          });
+
+          return {
+            liked: false,
+          };
+        } else {
+          const like = await prisma.commentLike.create({
+            data: {
+              userId,
+              postId,
+              commentId,
+            },
+          });
+
+          const likeCount = await prisma.commentLike.count({
+            where: {
+              commentId,
+            },
+          });
+
+          const setCommentLike = await prisma.comment.update({
+            where: {
+              id: commentId,
+            },
+            data: { likeCount },
+          });
+
+          return {
+            liked: true,
+          };
+        }
+      } catch (error) {
+        throw new Error("Internal Server Error!");
+      }
+    },
   },
 };
 

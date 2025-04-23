@@ -7,6 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model CommentLike {
+  id        String   @id @default(uuid()) @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
+  comment   Comment  @relation(fields: [commentId], references: [id])
+  userId    String   @db.Uuid
+  postId    String   @db.Uuid
+  commentId String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([userId, postId, commentId])
+}
+
 model PostLike {
   id        String   @id @default(uuid()) @db.Uuid
   user      User     @relation(fields: [userId], references: [id])
@@ -26,6 +39,9 @@ model Comment {
   Post      Post?    @relation(fields: [postId], references: [id])
   postId    String?  @db.Uuid
   createdAt DateTime @default(now()) @db.Timestamptz(6)
+  likeCount Int      @default(0)
+
+  CommentLike CommentLike[]
 }
 
 model Post {
@@ -39,6 +55,8 @@ model Post {
   likeCount Int        @default(0)
   Comment   Comment[]
   postLikes PostLike[]
+
+  CommentLike CommentLike[]
 }
 
 model User {
@@ -51,6 +69,8 @@ model User {
   posts     Post[]
   Comment   Comment[]
   postLikes PostLike[]
+
+  CommentLike CommentLike[]
 }
 
 enum Role {
