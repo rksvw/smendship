@@ -1,14 +1,12 @@
 // File: backend/src/resolvers/index.js
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { pool } from "../config/db.js";
 import {
   AuthenticationError,
   UserInputError,
   ValidationError,
 } from "apollo-server-express";
 import prisma from "../config/prismaConfig.js";
-// import { v4 as uuidv4 } from "uuid";
 
 const resolvers = {
   Query: {
@@ -16,6 +14,7 @@ const resolvers = {
     getpost: async (_, { id }, context) => {
       const userId = getUserIdFromToken(context);
       if (!userId) throw new AuthenticationError("Unauthorized");
+
       const post = await prisma.post.findUnique({
         where: {
           id,
@@ -58,28 +57,25 @@ const resolvers = {
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      try {
-        const newUser = await prisma.user.create({
-          data: { name, email, password: hashedPassword },
-        });
 
-        const token = jwt.sign(
-          { userId: newUser.id, role: newUser.role },
-          process.env.JWT_SECRET
-        );
+      const newUser = await prisma.user.create({
+        data: { name, email, password: hashedPassword },
+      });
 
-        return {
-          token,
-          user: {
-            id: newUser.id,
-            name: newUser.name,
-            email: newUser.email,
-            createdAt: newUser.createdAt,
-          },
-        };
-      } catch (err) {
-        throw new ValidationError("User already Exists!");
-      }
+      const token = jwt.sign(
+        { userId: newUser.id, role: newUser.role },
+        process.env.JWT_SECRET
+      );
+
+      return {
+        token,
+        user: {
+          id: newUser.id,
+          name: newUser.name,
+          email: newUser.email,
+          createdAt: newUser.createdAt,
+        },
+      };
     },
     login: async (_, { email, password }) => {
       if (!email || !password || email === "" || password === "") {
@@ -88,40 +84,36 @@ const resolvers = {
         );
       }
 
-      try {
-        const reqUser = await prisma.user.findUnique({
-          where: {
-            email,
-          },
-        });
+      const reqUser = await prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
 
-        if (!reqUser) throw new ValidationError("Invalid User");
+      if (!reqUser) throw new ValidationError("Invalid User");
 
-        const valid = await bcrypt.compare(password, reqUser.password);
-        if (!valid) throw new ValidationError("Invalid Password");
+      const valid = await bcrypt.compare(password, reqUser.password);
+      if (!valid) throw new ValidationError("Invalid Password");
 
-        const token = jwt.sign(
-          { userId: reqUser.id, role: reqUser.role },
-          process.env.JWT_SECRET,
-          {
-            expiresIn: "7d",
-          }
-        );
-        if (!token) {
-          throw new AuthenticationError("UnAuthentic Account");
+      const token = jwt.sign(
+        { userId: reqUser.id, role: reqUser.role },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "7d",
         }
-        return {
-          token,
-          user: {
-            id: reqUser.id,
-            name: reqUser.name,
-            email: reqUser.email,
-            createdAt: reqUser.createdAt,
-          },
-        };
-      } catch (err) {
-        throw new AuthenticationError("UnAuthorized Account");
+      );
+      if (!token) {
+        throw new AuthenticationError("UnAuthentic Account");
       }
+      return {
+        token,
+        user: {
+          id: reqUser.id,
+          name: reqUser.name,
+          email: reqUser.email,
+          createdAt: reqUser.createdAt,
+        },
+      };
     },
     createpost: async (_, { title, content, category }, context) => {
       const userId = getUserIdFromToken(context);
@@ -183,6 +175,71 @@ const resolvers = {
         message: "Post deleted Successfully",
       };
     },
+    likepost: async (_, { postId }, context) => {
+      const userId = getUserIdFromToken(context);
+      if (!userId) throw new AuthenticationError("Unauthorized");
+
+      const token = getToken(context);
+      if (!token) throw new AuthenticationError("Priviledged violation!");
+
+      try {
+        const existing = await prisma.postLike.findUnique({
+          where: {
+            userId_postId: { userId, postId },
+          },
+        });
+
+        if (existing) {
+          const dislike = await prisma.postLike.delete({
+            where: {
+              id: existing.id,
+            },
+          });
+
+          const likeCount = await prisma.postLike.count({
+            where: {
+              postId,
+            },
+          });
+
+          const setPostLikes = await prisma.post.update({
+            where: {
+              id: postId,
+            },
+            data: {
+              likeCount,
+            },
+          });
+          return { liked: false };
+        } else {
+          const like = await prisma.postLike.create({
+            data: {
+              userId,
+              postId,
+            },
+          });
+
+          const likeCount = await prisma.postLike.count({
+            where: {
+              postId,
+            },
+          });
+
+          const setPostLikes = await prisma.post.update({
+            where: {
+              id: postId,
+            },
+            data: {
+              likeCount,
+            },
+          });
+
+          return { liked: true };
+        }
+      } catch (err) {
+        throw new Error("Internal Server Error");
+      }
+    },
     updateprofile: async (_, { name, email }, context) => {
       const userId = getUserIdFromToken(context);
       if (!userId) throw new AuthenticationError("Unauthorized");
@@ -203,7 +260,7 @@ const resolvers = {
       });
 
       const token = getToken(context);
-      if (!token) throw new AuthenticationError("Previledged violation");
+      if (!token) throw new AuthenticationError("Priviledged violation");
 
       return {
         token,
@@ -237,7 +294,7 @@ const resolvers = {
       if (!authorId) throw new AuthenticationError("Unauthorized");
 
       const token = getToken(context);
-      if (!token) throw new AuthenticationError("Previledged violation!");
+      if (!token) throw new AuthenticationError("Priviledged violation!");
 
       const mycomment = await prisma.comment.create({
         data: { comment, postId, authorId },

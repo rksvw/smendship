@@ -48,6 +48,10 @@ const typeDefs = gql`
     mycomment: [Comment!]!
   }
 
+  type LikeResponse {
+    liked: Boolean!
+  }
+
   type Query {
     hello: String!
     getpost(id: String!): PostPayload
@@ -60,6 +64,7 @@ const typeDefs = gql`
     updateprofile(name: String, email: String): AuthPayload
     deleteuser(id: String!): Message
     createpost(title: String!, content: String!, category: String!): PostPayload
+    likepost(postId: ID!): LikeResponse!
     updatepost(
       id: String!
       title: String
