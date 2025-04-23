@@ -7,36 +7,70 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model CommentLike {
+  id        String   @id @default(uuid()) @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
+  comment   Comment  @relation(fields: [commentId], references: [id])
+  userId    String   @db.Uuid
+  postId    String   @db.Uuid
+  commentId String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([userId, postId, commentId])
+}
+
+model PostLike {
+  id        String   @id @default(uuid()) @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @db.Uuid
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([userId, postId]) // Ensures 1 like per user per post
+}
+
 model Comment {
-  id        String    @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
   comment   String
-  author    User?     @relation(fields: [authorId], references: [id])
-  authorId  String?   @db.Uuid
-  Post      Post?     @relation(fields: [postId], references: [id])
-  postId    String?   @db.Uuid
-  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  author    User?    @relation(fields: [authorId], references: [id])
+  authorId  String?  @db.Uuid
+  Post      Post?    @relation(fields: [postId], references: [id])
+  postId    String?  @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  likeCount Int      @default(0)
+
+  CommentLike CommentLike[]
 }
 
 model Post {
-  id        String    @id @default(uuid()) @db.Uuid
+  id        String     @id @default(uuid()) @db.Uuid
   title     String
-  category  Category  @default(UNDEFINED)
+  category  Category   @default(UNDEFINED)
   content   String
-  author    User      @relation(fields: [authorId], references: [id])
-  authorId  String    @db.Uuid
-  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  author    User       @relation(fields: [authorId], references: [id])
+  authorId  String     @db.Uuid
+  createdAt DateTime   @default(now()) @db.Timestamptz(6)
+  likeCount Int        @default(0)
   Comment   Comment[]
+  postLikes PostLike[]
+
+  CommentLike CommentLike[]
 }
 
 model User {
-  id        String    @id @default(uuid()) @db.Uuid
-  name      String    @db.VarChar(100)
-  email     String    @unique @db.VarChar(100)
-  password  String    @db.VarChar(255)
-  role      Role      @default(USER)
-  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  id        String     @id @default(uuid()) @db.Uuid
+  name      String     @db.VarChar(100)
+  email     String     @unique @db.VarChar(100)
+  password  String     @db.VarChar(255)
+  role      Role       @default(USER)
+  createdAt DateTime   @default(now()) @db.Timestamptz(6)
   posts     Post[]
   Comment   Comment[]
+  postLikes PostLike[]
+
+  CommentLike CommentLike[]
 }
 
 enum Role {
