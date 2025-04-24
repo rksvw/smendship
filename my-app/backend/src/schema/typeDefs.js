@@ -11,6 +11,16 @@ const typeDefs = gql`
     createdAt: String!
   }
 
+  type FriendRequest {
+    id: ID!
+    senderId: String!
+    receiverId: String!
+  }
+
+  type RequestAccepted {
+    isAccepted: Boolean
+  }
+
   type Comment {
     id: ID!
     comment: String!
@@ -36,6 +46,11 @@ const typeDefs = gql`
 
   type Message {
     message: String
+  }
+
+  type FriendRequestPayload {
+    token: String!
+    friendrequested: FriendRequest
   }
 
   type CommentPayload {
@@ -76,6 +91,7 @@ const typeDefs = gql`
     updatecomment(id: String!, comment: String!): CommentPayload
     deletecomment(id: String!): Message
     likecomment(postId: ID!, commentId: ID!): LikeResponse
+    friendrequest(receiverId: String!): FriendRequestPayload
   }
 `;
 
