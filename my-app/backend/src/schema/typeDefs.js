@@ -13,8 +13,14 @@ const typeDefs = gql`
 
   type FriendRequest {
     id: ID!
-    senderId: String!
-    receiverId: String!
+    senderId: User!
+    receiverId: User!
+    isAccepted: Boolean
+  }
+
+  type Notification {
+    id: ID!
+    toUser: User!
   }
 
   type RequestAccepted {
@@ -50,7 +56,8 @@ const typeDefs = gql`
 
   type FriendRequestPayload {
     token: String!
-    friendrequested: FriendRequest
+    request: FriendRequest
+    notification: Notification
   }
 
   type CommentPayload {
@@ -91,7 +98,16 @@ const typeDefs = gql`
     updatecomment(id: String!, comment: String!): CommentPayload
     deletecomment(id: String!): Message
     likecomment(postId: ID!, commentId: ID!): LikeResponse
-    friendrequest(receiverId: String!): FriendRequestPayload
+    friendSendRequest(receiverId: String!): FriendRequestPayload
+    friendAcceptRequest(requestId: String!): FriendRequestPayload
+
+    friendRequestSent(senderId: String!, receiverId: String!): FriendRequestPayload
+    acceptFriendRequest(requestId: String!): FriendRequestPayload
+  }
+
+  type Subscription {
+  friendSentRequest(receiverId: String!): FriendRequestPayload
+  friendAcceptedRequest(fromUserId: String!): FriendRequestPayload
   }
 `;
 

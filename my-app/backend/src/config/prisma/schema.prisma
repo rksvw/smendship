@@ -7,51 +7,69 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model FriendRequest {
-  id String @id @default(uuid()) @db.Uuid
-  senderId String @db.Uuid
-  receiverId String @db.Uuid
-  isAccepted Boolean?
-  requestedAt DateTime @default(now()) @db.Timestamptz(6)
-  acceptedAt DateTime @updatedAt
+model Notification {
+  id       String   @id @default(uuid()) @db.Uuid
+  toUserId String   @db.Uuid
+  message  String
+  type     Request // e.g., 'FRIEND_REQUEST_SENT, 'FRIEND_REQUEST_ACCEPTED'
+  read     Boolean  @default(false)
+  sentAt   DateTime @default(now())
+  seenAt   DateTime @updatedAt
 
-  sender User @relation("SenderRequests", fields: [senderId], references: [id])
+  toUser     User         @relation(fields: [toUserId], references: [id])
+  Friendship Friendship[] @relation("Notification")
+}
+
+model FriendRequest {
+  id          String   @id @default(uuid()) @db.Uuid
+  senderId    String   @db.Uuid
+  receiverId  String   @db.Uuid
+  isAccepted  Boolean? // null -> PENDING, true -> ACCEPTED, false -> REJECTED
+  requestedAt DateTime @default(now()) @db.Timestamptz(6)
+  acceptedAt  DateTime @updatedAt
+
+  sender   User @relation("SenderRequests", fields: [senderId], references: [id])
   receiver User @relation("ReceiverRequests", fields: [receiverId], references: [id])
 
   @@unique([senderId, receiverId])
 }
 
 model Friendship {
-  id String @id @default(uuid()) @db.Uuid
-  user1Id String @db.Uuid
-  user2Id String @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
+  user1Id   String   @db.Uuid
+  user2Id   String   @db.Uuid
+  notifyId  String   @db.Uuid
   createdAt DateTime @default(now()) @db.Timestamptz(6)
-  user1 User @relation("User1Friends", fields: [user1Id], references: [id] )
-  user2 User @relation("User2Friends", fields: [user2Id], references: [id])
 
-  @@unique([user1Id, user2Id])
+  notify Notification @relation("Notification", fields: [notifyId], references: [id])
+  user1  User         @relation("User1Friends", fields: [user1Id], references: [id])
+  user2  User         @relation("User2Friends", fields: [user2Id], references: [id])
+
+  @@unique([user1Id, user2Id, notifyId])
 }
 
 model CommentLike {
   id        String   @id @default(uuid()) @db.Uuid
-  user      User     @relation(fields: [userId], references: [id])
-  post      Post     @relation(fields: [postId], references: [id])
-  comment   Comment  @relation(fields: [commentId], references: [id])
   userId    String   @db.Uuid
   postId    String   @db.Uuid
   commentId String   @db.Uuid
   createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  user    User    @relation(fields: [userId], references: [id])
+  post    Post    @relation(fields: [postId], references: [id])
+  comment Comment @relation(fields: [commentId], references: [id])
 
   @@unique([userId, postId, commentId])
 }
 
 model PostLike {
   id        String   @id @default(uuid()) @db.Uuid
-  user      User     @relation(fields: [userId], references: [id])
   userId    String   @db.Uuid
-  post      Post     @relation(fields: [postId], references: [id])
   postId    String   @db.Uuid
   createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id])
+  post Post @relation(fields: [postId], references: [id])
 
   @@unique([userId, postId]) // Ensures 1 like per user per post
 }
@@ -59,52 +77,58 @@ model PostLike {
 model Comment {
   id        String   @id @default(uuid()) @db.Uuid
   comment   String
-  author    User?    @relation(fields: [authorId], references: [id])
   authorId  String?  @db.Uuid
-  Post      Post?    @relation(fields: [postId], references: [id])
   postId    String?  @db.Uuid
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   likeCount Int      @default(0)
 
+  author      User?         @relation(fields: [authorId], references: [id])
+  Post        Post?         @relation(fields: [postId], references: [id])
   CommentLike CommentLike[]
 }
 
 model Post {
-  id        String     @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
   title     String
-  category  Category   @default(UNDEFINED)
   content   String
-  author    User       @relation(fields: [authorId], references: [id])
-  authorId  String     @db.Uuid
-  createdAt DateTime   @default(now()) @db.Timestamptz(6)
-  likeCount Int        @default(0)
-  
-  Comment   Comment[]
-  postLikes PostLike[]
+  authorId  String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  likeCount Int      @default(0)
+
+  category    Category      @default(UNDEFINED)
+  author      User          @relation(fields: [authorId], references: [id])
+  Comment     Comment[]
+  postLikes   PostLike[]
   CommentLike CommentLike[]
 }
 
 model User {
-  id        String     @id @default(uuid()) @db.Uuid
-  name      String     @db.VarChar(100)
-  email     String     @unique @db.VarChar(100)
-  password  String     @db.VarChar(255)
-  role      Role       @default(USER)
-  createdAt DateTime   @default(now()) @db.Timestamptz(6)
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @db.VarChar(100)
+  email     String   @unique @db.VarChar(100)
+  password  String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
 
-  posts     Post[]
-  Comment   Comment[]
-  postLikes PostLike[]
-  CommentLike CommentLike[]
-  FriendRequest FriendRequest[] @relation("SenderRequests")
-  ReceiveRequest FriendRequest[] @relation("ReceiverRequests")
-  Friendships1 Friendship[] @relation("User1Friends")
-  Friendships2 Friendship[] @relation("User2Friends")
+  role                  Role            @default(USER)
+  posts                 Post[]
+  Comment               Comment[]
+  postLikes             PostLike[]
+  CommentLike           CommentLike[]
+  FriendRequestSent     FriendRequest[] @relation("SenderRequests")
+  FriendRequestReceived FriendRequest[] @relation("ReceiverRequests")
+  Friendships1          Friendship[]    @relation("User1Friends")
+  Friendships2          Friendship[]    @relation("User2Friends")
+  Notifications         Notification[]
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+enum Request {
+  FRIEND_REQUEST_ACCEPTED
+  FRIEND_REQUEST_SENT
 }
 
 enum Category {
