@@ -101,13 +101,16 @@ const typeDefs = gql`
     friendSendRequest(receiverId: String!): FriendRequestPayload
     friendAcceptRequest(requestId: String!): FriendRequestPayload
 
-    friendRequestSent(senderId: String!, receiverId: String!): FriendRequestPayload
+    friendRequestSent(
+      senderId: String!
+      receiverId: String!
+    ): FriendRequestPayload
     acceptFriendRequest(requestId: String!): FriendRequestPayload
   }
 
   type Subscription {
-  friendSentRequest(receiverId: String!): FriendRequestPayload
-  friendAcceptedRequest(fromUserId: String!): FriendRequestPayload
+    friendSentRequest(receiverId: String!): FriendRequestPayload
+    friendAcceptedRequest(fromUserId: String!): FriendRequestPayload
   }
 `;
 

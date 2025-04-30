@@ -8,44 +8,45 @@ datasource db {
 }
 
 model Notification {
-  id       String   @id @default(uuid()) @db.Uuid
-  toUserId String   @db.Uuid
+  id       String    @id @default(uuid()) @db.Uuid
+  toUserId String    @db.Uuid
   message  String
-  type     Request // e.g., 'FRIEND_REQUEST_SENT, 'FRIEND_REQUEST_ACCEPTED'
-  read     Boolean  @default(false)
-  sentAt   DateTime @default(now())
-  seenAt   DateTime @updatedAt
+  read     Boolean   @default(false)
+  sentAt   DateTime  @default(now())
+  seenAt   DateTime? @updatedAt
 
   toUser     User         @relation(fields: [toUserId], references: [id])
-  Friendship Friendship[] @relation("Notification")
+  Friendship Friendship[]
 }
 
 model FriendRequest {
-  id          String   @id @default(uuid()) @db.Uuid
-  senderId    String   @db.Uuid
-  receiverId  String   @db.Uuid
+  id          String    @id @default(uuid()) @db.Uuid
+  senderId    String    @db.Uuid
+  receiverId  String    @db.Uuid
   isAccepted  Boolean? // null -> PENDING, true -> ACCEPTED, false -> REJECTED
-  requestedAt DateTime @default(now()) @db.Timestamptz(6)
-  acceptedAt  DateTime @updatedAt
+  requestedAt DateTime  @default(now()) @db.Timestamptz(6)
+  acceptedAt  DateTime? @updatedAt
 
-  sender   User @relation("SenderRequests", fields: [senderId], references: [id])
-  receiver User @relation("ReceiverRequests", fields: [receiverId], references: [id])
+  type     Request // e.g., 'FRIEND_REQUEST_SENT, 'FRIEND_REQUEST_ACCEPTED'
+  sender   User    @relation("SenderRequests", fields: [senderId], references: [id])
+  receiver User    @relation("ReceiverRequests", fields: [receiverId], references: [id])
 
   @@unique([senderId, receiverId])
 }
 
 model Friendship {
-  id        String   @id @default(uuid()) @db.Uuid
-  user1Id   String   @db.Uuid
-  user2Id   String   @db.Uuid
-  notifyId  String   @db.Uuid
+  id       String @id @default(uuid()) @db.Uuid
+  user1Id  String @db.Uuid
+  user2Id  String @db.Uuid
+  notifyId String @db.Uuid
+
   createdAt DateTime @default(now()) @db.Timestamptz(6)
 
-  notify Notification @relation("Notification", fields: [notifyId], references: [id])
-  user1  User         @relation("User1Friends", fields: [user1Id], references: [id])
-  user2  User         @relation("User2Friends", fields: [user2Id], references: [id])
+  notification Notification @relation(fields: [notifyId], references: [id])
+  user1        User         @relation("User1Friends", fields: [user1Id], references: [id])
+  user2        User         @relation("User2Friends", fields: [user2Id], references: [id])
 
-  @@unique([user1Id, user2Id, notifyId])
+  @@unique([user1Id, user2Id])
 }
 
 model CommentLike {
@@ -118,7 +119,8 @@ model User {
   FriendRequestReceived FriendRequest[] @relation("ReceiverRequests")
   Friendships1          Friendship[]    @relation("User1Friends")
   Friendships2          Friendship[]    @relation("User2Friends")
-  Notifications         Notification[]
+
+  Notification Notification[]
 }
 
 enum Role {
