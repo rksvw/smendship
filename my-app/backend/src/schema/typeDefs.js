@@ -18,11 +18,6 @@ const typeDefs = gql`
     isAccepted: Boolean
   }
 
-  type Notification {
-    id: ID!
-    toUser: User!
-  }
-
   type RequestAccepted {
     isAccepted: Boolean
   }
@@ -57,7 +52,6 @@ const typeDefs = gql`
   type FriendRequestPayload {
     token: String!
     request: FriendRequest
-    notification: Notification
   }
 
   type CommentPayload {
@@ -102,7 +96,6 @@ const typeDefs = gql`
     friendAcceptRequest(requestId: String!): FriendRequestPayload
 
     friendRequestSent(
-      senderId: String!
       receiverId: String!
     ): FriendRequestPayload
     acceptFriendRequest(requestId: String!): FriendRequestPayload
@@ -110,7 +103,7 @@ const typeDefs = gql`
 
   type Subscription {
     friendSentRequest(receiverId: String!): FriendRequestPayload
-    friendAcceptedRequest(fromUserId: String!): FriendRequestPayload
+    friendAcceptedRequest(fromUserId: String!, toUserId: String!): FriendRequestPayload
   }
 `;
 

@@ -413,28 +413,20 @@ const resolvers = {
       if (!senderId) throw new AuthenticationError("Unauthorized");
 
       const req = await prisma.friendRequest.create({
-        data: { senderId, receiverId },
+        data: { senderId, receiverId, type: "FRIEND_REQUEST_SENT" },
       });
 
       console.log(req, "\n Request is saved successfully");
 
-      const notification = await prisma.notification.create({
-        data: {
-          toUserId: receiverId,
-          message: `User ${senderId} sent you a friend request`,
-          type: "FRIEND_REQUEST_SENT",
-        },
-      });
-
       // real-time publish (online user) --> When user1 is send request user2 notify
       await pubsub.publish(FRIEND_REQUEST_SENT, {
-        friendSentRequest: { req, notification },
+        friendSentRequest: { req },
       });
     },
     friendAcceptRequest: async (_, { requestId }, context) => {
       const reqAccept = await prisma.friendRequest.update({
         where: { id: requestId },
-        data: { isAccepted: true, acceptedAt: new Date() },
+        data: { isAccepted: true, acceptedAt: new Date(), type: "FRIEND_REQUEST_ACCEPTED" },
       });
 
       const getUserInfo = await prisma.friendRequest.findUnique({
@@ -455,7 +447,6 @@ const resolvers = {
           data: {
             user1Id: getUserInfo.senderId,
             user2Id: getUserInfo.receiverId,
-            notifyId: getUserInfo.notifyId,
           },
         });
 
@@ -464,23 +455,10 @@ const resolvers = {
           "\n Friendship is accepted successfully"
         );
 
-        const notification = await prisma.notification.update({
-          where: {
-            id: stabilizedFriendship.notifyId,
-          },
-          data: {
-            message: "Friendship stabilised successfully",
-            seenAt: new Date(),
-          },
-        });
-
-        console.log(notification, "\n Notification sent successfully");
-
         // Notify both users
         await pubsub.publish(FRIEND_REQUEST_ACCEPTED, {
           friendAcceptedRequest: {
             reqAccept,
-            notification,
           },
         });
         console.log("All done successfully");
