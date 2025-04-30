@@ -1,5 +1,5 @@
 // File: backend/src/resolvers/index.js
-import bcrypt from "bcrypt";
+import bcrypt, { compareSync } from "bcrypt";
 import jwt from "jsonwebtoken";
 import {
   AuthenticationError,
@@ -7,6 +7,11 @@ import {
   ValidationError,
 } from "apollo-server-express";
 import prisma from "../config/prismaConfig.js";
+import {
+  FRIEND_REQUEST_ACCEPTED,
+  FRIEND_REQUEST_SENT,
+  pubsub,
+} from "../config/pubsub.js";
 
 const resolvers = {
   Query: {
@@ -402,6 +407,72 @@ const resolvers = {
       } catch (error) {
         throw new Error("Internal Server Error!");
       }
+    },
+    friendSendRequest: async (_, { receiverId }, context) => {
+      const senderId = getUserIdFromToken(context);
+      if (!senderId) throw new AuthenticationError("Unauthorized");
+
+      const req = await prisma.friendRequest.create({
+        data: { senderId, receiverId, type: "FRIEND_REQUEST_SENT" },
+      });
+
+      console.log(req, "\n Request is saved successfully");
+
+      // real-time publish (online user) --> When user1 is send request user2 notify
+      await pubsub.publish(FRIEND_REQUEST_SENT, {
+        friendSentRequest: { req },
+      });
+    },
+    friendAcceptRequest: async (_, { requestId }, context) => {
+      const reqAccept = await prisma.friendRequest.update({
+        where: { id: requestId },
+        data: { isAccepted: true, acceptedAt: new Date(), type: "FRIEND_REQUEST_ACCEPTED" },
+      });
+
+      const getUserInfo = await prisma.friendRequest.findUnique({
+        where: { id: requestId },
+      });
+
+      const isFriend = await prisma.friendship.findFirst({
+        where: {
+          OR: [
+            { user1Id: getUserInfo.senderId, user2Id: getUserInfo.receiverId },
+            { user1Id: getUserInfo.receiverId, user2Id: getUserInfo.senderId },
+          ],
+        },
+      });
+
+      if (!isFriend) {
+        const stabilizedFriendship = await prisma.friendship.create({
+          data: {
+            user1Id: getUserInfo.senderId,
+            user2Id: getUserInfo.receiverId,
+          },
+        });
+
+        console.log(
+          stabilizedFriendship,
+          "\n Friendship is accepted successfully"
+        );
+
+        // Notify both users
+        await pubsub.publish(FRIEND_REQUEST_ACCEPTED, {
+          friendAcceptedRequest: {
+            reqAccept,
+          },
+        });
+        console.log("All done successfully");
+      } else {
+        console.log("Friendship already exists!");
+      }
+    },
+  },
+  Subscription: {
+    friendSentRequest: {
+      subscribe: () => pubsub.asyncIterableIterator(FRIEND_REQUEST_SENT),
+    },
+    friendAcceptedRequest: {
+      subscribe: () => pubsub.asyncIterableIterator(FRIEND_REQUEST_ACCEPTED),
     },
   },
 };
