@@ -11,6 +11,26 @@ const typeDefs = gql`
     createdAt: String!
   }
 
+  type Message {
+    id: String!
+    content: String!
+    sender: User!
+    chatRoom: ChatRoom!
+  }
+
+  type ChatRoom {
+    id: String!
+    isGroup: Boolean!
+    participants: [Participant!]!
+    messages: [Message!]!
+  }
+
+  type Participant {
+    id: String!
+    user: User!
+    chatRoom: ChatRoom!
+  }
+
   type FriendRequest {
     id: ID!
     senderId: User!
@@ -77,8 +97,10 @@ const typeDefs = gql`
   type Mutation {
     signup(name: String!, email: String!, password: String!): AuthPayload
     login(email: String!, password: String!): AuthPayload
+
     updateprofile(name: String, email: String): AuthPayload
     deleteuser(id: String!): Message
+
     createpost(title: String!, content: String!, category: String!): PostPayload
     likepost(postId: ID!): LikeResponse!
     updatepost(
@@ -88,22 +110,27 @@ const typeDefs = gql`
       category: String
     ): PostPayload
     deletepost(id: String!): Message
+
     createcomment(comment: String!, postId: String!): CommentPayload
     updatecomment(id: String!, comment: String!): CommentPayload
     deletecomment(id: String!): Message
+
     likecomment(postId: ID!, commentId: ID!): LikeResponse
+
     friendSendRequest(receiverId: String!): FriendRequestPayload
     friendAcceptRequest(requestId: String!): FriendRequestPayload
 
-    friendRequestSent(
-      receiverId: String!
-    ): FriendRequestPayload
-    acceptFriendRequest(requestId: String!): FriendRequestPayload
+    activateChatRoom(targetUserId: String!): ChatRoom!
+    textMessage(chatRoomId: String!, content: String!): Message!
   }
 
   type Subscription {
     friendSentRequest(receiverId: String!): FriendRequestPayload
-    friendAcceptedRequest(fromUserId: String!, toUserId: String!): FriendRequestPayload
+    friendAcceptedRequest(
+      fromUserId: String!
+      toUserId: String!
+    ): FriendRequestPayload
+    activeChat(chatRoomId: String!): Message!
   }
 `;
 

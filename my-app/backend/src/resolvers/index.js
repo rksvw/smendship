@@ -426,7 +426,11 @@ const resolvers = {
     friendAcceptRequest: async (_, { requestId }, context) => {
       const reqAccept = await prisma.friendRequest.update({
         where: { id: requestId },
-        data: { isAccepted: true, acceptedAt: new Date(), type: "FRIEND_REQUEST_ACCEPTED" },
+        data: {
+          isAccepted: true,
+          acceptedAt: new Date(),
+          type: "FRIEND_REQUEST_ACCEPTED",
+        },
       });
 
       const getUserInfo = await prisma.friendRequest.findUnique({
@@ -466,6 +470,86 @@ const resolvers = {
         console.log("Friendship already exists!");
       }
     },
+
+    activateChatRoom: async (_, { targetUserId }, context) => {
+      const userId = getUserIdFromToken(context);
+      if (!userId) throw new AuthenticationError("Unauthorized");
+
+      const isChatRoomExist = await prisma.chatRoom.findFirst({
+        where: {
+          isGroup: false,
+          participants: {
+            some: {
+              userId,
+            },
+          },
+          AND: {
+            participants: {
+              some: {
+                userId: targetUserId,
+              },
+            },
+          },
+        },
+        include: {
+          participants: true,
+        },
+      });
+
+      if (isChatRoomExist) {
+        return {
+          id: isChatRoomExist.id,
+        };
+      }
+
+      const startChatRoom = await prisma.chatRoom.create({
+        data: {
+          isGroup: false,
+          participants: {
+            create: [
+              { user: { connect: { id: userId } } },
+              { user: { connect: { id: targetUserId } } },
+            ],
+          },
+        },
+        include: {
+          participants: true,
+        },
+      });
+
+      console.log(startChatRoom);
+
+      return {
+        id: startChatRoom.id,
+        isGroup: startChatRoom.isGroup,
+      };
+    },
+    textMessage: async (_, { chatRoomId, content }, context) => {
+      const userId = getUserIdFromToken(context);
+      if (!userId) throw new AuthenticationError("Unauthorized");
+
+      const msg = await prisma.message.create({
+        data: {
+          content,
+          chatRoom: { connect: { id: chatRoomId } },
+          sender: { connect: { id: userId } },
+        },
+        include: {
+          sender: true,
+          chatRoom: true,
+        },
+      });
+
+      await pubsub.publish(`CHAT_${chatRoomId}`, {
+        activeChat: msg,
+      });
+      return {
+        id: msg.id,
+        content: msg.content,
+        chatRoom: msg.chatRoom,
+        sender: msg.sender,
+      };
+    },
   },
   Subscription: {
     friendSentRequest: {
@@ -473,6 +557,11 @@ const resolvers = {
     },
     friendAcceptedRequest: {
       subscribe: () => pubsub.asyncIterableIterator(FRIEND_REQUEST_ACCEPTED),
+    },
+    activeChat: {
+      subscribe: (_, { chatRoomId }) => {
+        return pubsub.asyncIterableIterator(`CHAT_${chatRoomId}`);
+      },
     },
   },
 };
