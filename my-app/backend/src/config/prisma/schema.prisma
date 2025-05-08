@@ -7,17 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// model Notification {
-//   id       String    @id @default(uuid()) @db.Uuid
-//   toUserId String    @db.Uuid
-//   message  String
-//   read     Boolean   @default(false)
-//   sentAt   DateTime  @default(now())
-//   seenAt   DateTime? @updatedAt
+model Notification {
+  id         String   @id @default(uuid()) @db.Uuid
+  fromUserId String   @db.Uuid
+  toUserId   String   @db.Uuid
+  type       String
+  postId     String?  @db.Uuid
+  isRead     Boolean  @default(false)
+  notifiedAt DateTime @default(now()) @db.Timestamp(6)
 
-//   toUser     User         @relation(fields: [toUserId], references: [id])
-//   Friendship Friendship[]
-// }
+  user1 User  @relation("sendBy", fields: [fromUserId], references: [id])
+  user2 User  @relation("receiveBy", fields: [toUserId], references: [id])
+  post  Post? @relation(fields: [postId], references: [id])
+}
 
 model FriendRequest {
   id          String    @id @default(uuid()) @db.Uuid
@@ -95,11 +97,12 @@ model Post {
   createdAt DateTime @default(now()) @db.Timestamp(6)
   likeCount Int      @default(0)
 
-  category    Category      @default(UNDEFINED)
-  author      User          @relation(fields: [authorId], references: [id])
-  Comment     Comment[]
-  postLikes   PostLike[]
-  CommentLike CommentLike[]
+  category     Category       @default(UNDEFINED)
+  author       User           @relation(fields: [authorId], references: [id])
+  Comment      Comment[]
+  postLikes    PostLike[]
+  CommentLike  CommentLike[]
+  Notification Notification[]
 }
 
 model User {
@@ -120,6 +123,8 @@ model User {
   Friendships2          Friendship[]    @relation("User2Friends")
   Message               Message[]       @relation("UserMessages")
   Participant           Participant[]
+  Notification1         Notification[]  @relation("sendBy")
+  Notification2         Notification[]  @relation("receiveBy")
 
   // Notification Notification[]
 }
@@ -172,4 +177,12 @@ enum Category {
   GAMES
   ANIME
   MOVIES
+}
+
+enum Msg {
+  USER_REQUEST
+  USER_REQUEST_ACCEPTED
+  LIKE_POST
+  CREATE_POST
+  COMMENT_POST
 }

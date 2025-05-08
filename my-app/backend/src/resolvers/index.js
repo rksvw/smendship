@@ -10,12 +10,32 @@ import prisma from "../config/prismaConfig.js";
 import {
   FRIEND_REQUEST_ACCEPTED,
   FRIEND_REQUEST_SENT,
-  pubsub,
 } from "../config/pubsub.js";
+import pubsub from "../subscription/pubsub.js";
+// import { subscribeToNotify } from "../utils/subscriber.js";
 
 const resolvers = {
+  Notification: {
+    fromUserId: (parent, _) =>
+      prisma.user.findUnique({ where: { id: parent.fromUserId } }),
+    toUserId: (parent, _) =>
+      prisma.user.findUnique({ where: { id: parent.toUserId } }),
+    post: (parent, _) =>
+      parent.postId
+        ? prisma.post.findUnique({ where: { id: parent.postId } })
+        : null,
+  },
   Query: {
     hello: () => "Hello World! 🌍",
+    getNotification: async (_, __, context) => {
+      const userId = getUserIdFromToken(context);
+      if (!userId) throw new AuthenticationError("Unauthorized");
+
+      return await prisma.notification.findMany({
+        where: { toUserId: userId },
+        orderBy: { notifiedAt: "desc" },
+      });
+    },
     getpost: async (_, { id }, context) => {
       const userId = getUserIdFromToken(context);
       if (!userId) throw new AuthenticationError("Unauthorized");
@@ -418,6 +438,21 @@ const resolvers = {
 
       console.log(req, "\n Request is saved successfully");
 
+      const notification = await createNotification({
+        type: "CHAT_ROOM_ACTIVATED",
+        toUserId: receiverId,
+        fromUserId: senderId,
+      });
+
+      console.log("activate chat");
+
+      console.log(notification);
+      console.log("targetuserId", receiverId);
+
+      pubsub.publish(`notify:${receiverId}`, {
+        iNotified: notification,
+      });
+
       // real-time publish (online user) --> When user1 is send request user2 notify
       await pubsub.publish(FRIEND_REQUEST_SENT, {
         friendSentRequest: { req },
@@ -459,7 +494,6 @@ const resolvers = {
           "\n Friendship is accepted successfully"
         );
 
-        // Notify both users
         await pubsub.publish(FRIEND_REQUEST_ACCEPTED, {
           friendAcceptedRequest: {
             reqAccept,
@@ -497,6 +531,21 @@ const resolvers = {
       });
 
       if (isChatRoomExist) {
+        const notification = await createNotification({
+          type: "CHAT_ROOM_ACTIVATED",
+          toUserId: targetUserId,
+          fromUserId: userId,
+        });
+
+        console.log("activate chat");
+
+        console.log(notification);
+        console.log("targetuserId", targetUserId);
+
+        pubsub.publish(`notify:${targetUserId}`, {
+          iNotified: notification,
+        });
+
         return {
           id: isChatRoomExist.id,
         };
@@ -517,7 +566,20 @@ const resolvers = {
         },
       });
 
-      console.log(startChatRoom);
+      const notification = await createNotification({
+        type: "CHAT_ROOM_ACTIVATED",
+        toUserId: targetUserId,
+        fromUserId: userId,
+      });
+
+      console.log("activate chat");
+
+      console.log(notification);
+      console.log("targetuserId", targetUserId);
+
+      pubsub.publish(`notify:${targetUserId}`, {
+        iNotified: notification,
+      });
 
       return {
         id: startChatRoom.id,
@@ -550,17 +612,42 @@ const resolvers = {
         sender: msg.sender,
       };
     },
+    iNotify: async (_, { id }, context) => {
+      const userId = getUserIdFromToken(context);
+      if (!userId) throw new AuthenticationError("Unauthorized");
+
+      const notify = await prisma.notification.findUnique({
+        where: { id },
+      });
+
+      if (notify.toUserId !== userId) throw new Error("Unauthorized");
+      return await prisma.notification.update({
+        where: { id },
+        data: { isRead: true },
+      });
+    },
   },
   Subscription: {
     friendSentRequest: {
-      subscribe: () => pubsub.asyncIterableIterator(FRIEND_REQUEST_SENT),
+      subscribe: () => pubsub.asyncIterator(FRIEND_REQUEST_SENT),
     },
     friendAcceptedRequest: {
-      subscribe: () => pubsub.asyncIterableIterator(FRIEND_REQUEST_ACCEPTED),
+      subscribe: () => pubsub.asyncIterator(FRIEND_REQUEST_ACCEPTED),
     },
     activeChat: {
       subscribe: (_, { chatRoomId }) => {
-        return pubsub.asyncIterableIterator(`CHAT_${chatRoomId}`);
+        return pubsub.asyncIterator(`CHAT_${chatRoomId}`);
+      },
+    },
+    iNotified: {
+      subscribe: (_, {userId}) => {
+        return pubsub.asyncIterator(`notify:${userId}`);
+      },
+      resolve: (payload) => {
+        if (!payload || !payload.iNotified || !payload.iNotified.id) {
+          throw new Error("Invalid payload for activeNotify subscription");
+        }
+        return payload.iNotified;
       },
     },
   },
@@ -590,6 +677,38 @@ function checkIsAdmin(context) {
   } catch (err) {
     return null;
   }
+}
+
+async function createNotification({
+  type,
+  fromUserId,
+  toUserId,
+  postId = null,
+}) {
+  if (fromUserId === toUserId) return null;
+
+  const notify = await prisma.notification.create({
+    data: { type, fromUserId, toUserId, postId },
+  });
+
+  return notify;
+}
+
+async function updateNotification({
+  id,
+  type,
+  fromUserId,
+  toUserId,
+  postId = null,
+}) {
+  console.log("Update test: ", type, fromUserId, toUserId);
+
+  if (fromUserId === toUserId) return null;
+
+  const notify = await prisma.notification.update({
+    where: { id },
+    data: { type },
+  });
 }
 
 export default resolvers;
