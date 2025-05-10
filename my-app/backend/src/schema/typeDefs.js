@@ -11,6 +11,16 @@ const typeDefs = gql`
     createdAt: String!
   }
 
+  type Notification {
+    id: String!
+    type: String!
+    fromUserId: User!
+    toUserId: User!
+    post: Post
+    isRead: Boolean!
+    notifiedAt: String!
+  }
+
   type Message {
     id: String!
     content: String!
@@ -92,6 +102,7 @@ const typeDefs = gql`
     hello: String!
     getpost(id: String!): PostPayload
     getcomments(postId: String!): CommentsPayload
+    getNotification: [Notification!]!
   }
 
   type Mutation {
@@ -122,6 +133,8 @@ const typeDefs = gql`
 
     activateChatRoom(targetUserId: String!): ChatRoom!
     textMessage(chatRoomId: String!, content: String!): Message!
+
+    iNotify(id: String!): Notification
   }
 
   type Subscription {
@@ -131,6 +144,7 @@ const typeDefs = gql`
       toUserId: String!
     ): FriendRequestPayload
     activeChat(chatRoomId: String!): Message!
+    iNotified(userId: String!): Notification
   }
 `;
 
