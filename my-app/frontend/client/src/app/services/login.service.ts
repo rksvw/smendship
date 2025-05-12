@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class LoginService {
-  private loginUrl = 'http://localhost:4000/graphql';
+  private baseUrl = 'http://localhost:4000/graphql';
 
   constructor(private http: HttpClient) {}
 
@@ -26,6 +26,23 @@ export class LoginService {
 
     const variables = { email, password };
 
-    return this.http.post(this.loginUrl, { query, variables });
+    return this.http.post(this.baseUrl, { query, variables });
+  }
+
+  newUser(name: string, email: string, password: string): Observable<any> {
+    const query = `
+    mutation($name: String!, $email: String!, $password: String!) {
+      signup(name: $name, email: $email, password: $password) {
+        token
+        user {
+          id
+          name
+          email
+        }
+      }
+    }`;
+
+    const variables = { name, email, password };
+    return this.http.post(this.baseUrl, { query, variables });
   }
 }
