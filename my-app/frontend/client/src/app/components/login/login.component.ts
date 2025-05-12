@@ -17,7 +17,7 @@ export class LoginComponent {
   protected errMsg: string = '';
 
   protected placeholder = {
-    email: 'example@email.com',
+    email: 'hostname@hotmail.com',
     password: '********',
   };
 
@@ -26,9 +26,8 @@ export class LoginComponent {
   onLogin() {
     this.loginService.login(this.email, this.password).subscribe({
       next: (response) => {
-        console.log("A response data: ",response);
         const token = response.data?.login?.token;
-        const userId = response.data?.login?.user.id;
+        const userId = response.data?.login?.user?.id;
 
         if (token) {
           localStorage.setItem('token', token);
