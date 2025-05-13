@@ -14,12 +14,16 @@ export class HeaderComponent {
 
   toggleDropdown() {
     this.isDropdownOpen = !this.isDropdownOpen; // * Work like a button 1-click : on , another-click : off
-    console.log("work2")
   }
+
+  onSelect(option: string) {
+    this.isDropdownOpen = false;
+  }
+
+
 
   selectOption(option: string) {
     this.selectedOption = option;
-    console.log("work")
     // this.isDropdownOpen = false;
   }
 }

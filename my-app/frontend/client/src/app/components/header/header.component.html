@@ -1,13 +1,17 @@
 <div class="header-container">
+  <span class="omoi-logo"><a href="">Logo</a></span>
   <ul>
-    <li class="omoi-logo"><a href="">Logo</a></li>
-    <li>
+    <li class="drop-down">
       <div class="nofy-dropdown">
         <button (click)="toggleDropdown()">
           {{ selectedOption || "Notification" }}
         </button>
-        <ul class="toggle" *ngIf="isDropdownOpen">
-          <li *ngFor="let option of options" (click)="selectOption(option)">
+        <ul class="toggle" *ngIf="isDropdownOpen" [class.show]="isDropdownOpen">
+          <li
+            *ngFor="let option of options"
+            (click)="selectOption(option)"
+            (click)="onSelect(option)"
+          >
             {{ option }}
           </li>
         </ul>
@@ -15,5 +19,6 @@
     </li>
     <li><a href="">Post</a></li>
     <li><a href="">Friend Request</a></li>
+    <li class="srch"><input type="search" name="search" id="search" placeholder="Search your query!" li>
   </ul>
 </div>

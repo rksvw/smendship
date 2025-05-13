@@ -1,81 +1,135 @@
 .header-container {
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-    height: 56px;
-    background-color: beige;
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    padding: 10px 0px;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  height: 56px;
+  background-color: beige;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  padding: 10px auto;
 }
 
-.header-container > ul {
+.omoi-logo {
+  padding: 10px 30px;
+  background-color: rgba(35, 240, 172, 0.692);
+  margin: 0px 30px;
+  border-radius: 3px;
+  box-shadow: 0px 3px 3px 0px rgba(125, 125, 125, 0.5);
+
+  a {
+    background: -webkit-linear-gradient(#7a28ff, #adc3ff);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-decoration: none;
+  }
+}
+
+  .header-container > ul {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 15px;
+    width: 65%;
     list-style: none;
-    font-size: 16px;
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
     font-weight: 600;
 
-    li.omoi-logo {
-        padding: 10px 30px;
-        background-color: rgba(35, 240, 172, 0.692);
-        margin: 0px 20px;
-        border-radius: 3px;
-        box-shadow: 0px 3px 3px 0px rgba(125, 125, 125, .5);
-
-        a {
-            background: -webkit-linear-gradient(#7a28ff, #adc3ff);
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-decoration: none;
-        }
-    }
-
     li {
-        margin: 0 5px;
-        box-shadow: 0px 3px 3px 0px rgba(125, 125, 125, .5);
-        border-radius: 5px;
-        padding: 10px 20px;
-        background-color: rgba(201, 240, 218, 0.932);
+      margin: 0 35px;
+      box-shadow: 0px 3px 3px 0px rgba(125, 125, 125, 0.5);
+      border-radius: 5px;
+      padding: 10px 20px;
+      background-color: rgba(201, 240, 218, 0.932);
+      cursor: pointer;
+      border-left: 5px solid black;
+      border-right: 5px solid black;
 
-
-        a {
-            color: rgb(43, 43, 43);
-            text-decoration: none;
-        }
-
-
-        div.nofy-dropdown {
-            position: relative;
-
-
-            button {
-                outline: none;
-                font-weight: 600;
-                font-size: 16px;
-                background-color: transparent;
-                border: none;
-                color: rgb(43, 43, 43);
-            }
-
-            ul.toggle {
-                box-shadow: 0px 3px 3px 0px rgba(125, 125, 125, .5);
-                position: fixed;
-                list-style: none;
-                top: 78px;
-
-
-                li {
-                    display: flex;
-                    width: 100%;
-                    justify-content: center;
-                }
-            }
-
-        }
+      a {
+        color: rgb(43, 43, 43);
+        text-decoration: none;
+      }
     }
+
+    li.srch {
+        border: none;
+        background-color: transparent;
+        box-shadow: none;
+        min-width: 400px;
+
+        #search {
+            border: none;
+            outline: none;
+            display: flex;
+            flex: 1;
+            width: 100%;
+            padding: 8px 20px;
+            border-radius: 3px;
+            font-weight: 500;
+          }
+    }
+
+
+  li.drop-down {
+    div.nofy-dropdown {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      button {
+        outline: none;
+        font-weight: 600;
+        font-size: 16px;
+        background-color: transparent;
+        border: none;
+        color: rgb(43, 43, 43);
+        cursor: pointer;
+      }
+
+      ul.toggle {
+        position: absolute;
+        box-shadow: 0px 3px 3px 0px rgba(125, 125, 125, 0.5);
+        list-style: none;
+        top: 45px;
+        z-index: 1000;
+        border: none !important;
+        background-color: beige;
+        padding: 8px 0;
+        border-top-left-radius: 0px;
+        border-top-right-radius: 0px;
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+        margin: 0;
+        overflow: hidden;
+
+        max-height: 0;
+        opacity: 0;
+        transition: max-height 0.3s ease, opacity 0.3s ease;
+        pointer-events: none;
+
+        &.show {
+          max-height: 500px;
+          opacity: 1;
+          pointer-events: auto;
+        }
+
+        li {
+          padding: 8px 12px;
+          width: 120px;
+          border-radius: 0;
+          margin: 1px 5px;
+          background-color: white;
+          cursor: pointer;
+          transition: background 0.2s ease-in-out;
+
+          &:hover {
+            background-color: #30f7fa;
+          }
+        }
+      }
+    }
+  }
+
 }
