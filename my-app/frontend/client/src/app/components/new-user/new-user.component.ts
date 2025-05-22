@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LoginService } from '../../services/login.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { NewUserService } from '../../services/new-user.service';
 
 @Component({
   selector: 'app-new-user',
-  imports: [CommonModule, FormsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './new-user.component.html',
   styleUrl: './new-user.component.scss',
 })
@@ -24,11 +25,11 @@ export class NewUserComponent {
     password: '********',
   };
 
-  constructor(private newUserService: LoginService, private router: Router) {}
+  constructor(private newUserService: NewUserService, private router: Router) {}
 
   onSignup() {
     this.newUserService
-      .newUser(this.name, this.email, this.password)
+      .signup(this.name, this.email, this.password)
       .subscribe({
         next: (response) => {
           const token = response.data?.signup?.token;

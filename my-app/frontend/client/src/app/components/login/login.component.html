@@ -24,6 +24,10 @@
 
     <button type="submit">Login</button>
 
-    <span *ngIf="this.errMsg.length > 0">{{ this.errMsg }}</span>
+    <span *ngIf="errMsg.length > 0">{{ errMsg }}</span>
+    
+    <div>
+      <a [routerLink]="['/create-user']">Don't have an account? Sign up</a>
+    </div>
   </form>
 </div>

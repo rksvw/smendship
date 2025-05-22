@@ -5,15 +5,15 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
-export class LoginService {
+export class NewUserService {
   private baseUrl = 'http://localhost:4000/graphql';
 
   constructor(private http: HttpClient) {}
 
-  login(email: string, password: string): Observable<any> {
+  signup(name: string, email: string, password: string): Observable<any> {
     const query = `
-    mutation($email: String!, $password: String!) {
-      login(email: $email, password: $password) {
+    mutation($name: String!, $email: String!, $password: String!) {
+      signup(name: $name, email: $email, password: $password) {
         token
         user {
           id
@@ -21,11 +21,9 @@ export class LoginService {
           email
         }
       }
-    }
-    `;
+    }`;
 
-    const variables = { email, password };
-
+    const variables = { name, email, password };
     return this.http.post(this.baseUrl, { query, variables });
   }
 }
