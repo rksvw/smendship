@@ -1,52 +1,50 @@
-.login-container {
+.new-user-container {
     display: block;
     width: 450px;
-    background-color: beige;
+    background-color:beige;
     border-radius: 5px;
     box-shadow: 0px 3px 3px 0px rgba(0, 0, 0, 0.5);
     margin: 100px auto;
 }
 
-.login-container > form {
+
+.new-user-container > form {
     display: flex;
     flex-direction: column;
     justify-content: center;
     padding: 20px 15px;
 }
 
-form > h2 {
+.new-user-container > form > h2 {
     text-align: center;
     font-size: 26px;
     padding-bottom: 5px;
-    border-bottom: 2px solid rgba(153, 153, 153, 0.349);
+    border-bottom: 2px solid  rgba(153, 153, 153, 0.349);
     margin-bottom: 50px;
 }
 
-label {
+.new-user-container > form > label {
     font-size: 18px;
     margin-bottom: 5px;
 }
 
-input {
+.new-user-container > form > input {
     display: flex;
     flex: 1;
     padding: 8px 10px;
     outline: none;
     border: none;
-    border-radius: 3px;
+    border-radius: 5px;
     color: #4b4b4b;
     font-size: 16px;
     margin-bottom: 5px;
 }
 
-button {
+.new-user-container > form > button {
     margin: 15px 0px;
-    display: flex;
-    flex: 1;
-    justify-content: center;
+    text-align: center;
     padding: 8px 20px;
     border: none;
-    border-radius: 5px;
     background-color: #97ffff;
     font-weight: 500;
     color: rgb(7, 65, 131);
@@ -54,7 +52,7 @@ button {
     cursor: pointer;
 }
 
-.login-container > form > span {
+.new-user-container > form > span {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;

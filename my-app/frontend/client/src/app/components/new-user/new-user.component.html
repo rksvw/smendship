@@ -1,0 +1,42 @@
+<div class="new-user-container">
+  <form (ngSubmit)="onSignup()">
+    <h2>{{ customsType.title }}</h2>
+
+    <label for="name">Name</label>
+    <input
+      type="text"
+      name="name"
+      [(ngModel)]="name"
+      required
+      [placeholder]="customsType.name"
+    />
+
+    <label for="email">Email</label>
+    <input
+      type="email"
+      name="email"
+      [(ngModel)]="email"
+      class="new-user-email"
+      required
+      [placeholder]="customsType.email"
+    />
+
+    <label for="password">Password</label>
+    <input
+      type="password"
+      name="password"
+      [(ngModel)]="password"
+      class="new-user-password"
+      required
+      [placeholder]="customsType.password"
+    />
+
+    <button type="submit">Signup</button>
+
+    <span *ngIf="errMsg.length > 0">{{errMsg}}</span>
+
+    <div>
+      <a [routerLink]="['/login']">Already have an account? Login</a>
+    </div>
+  </form>
+</div>
