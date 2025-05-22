@@ -1,3 +1,25 @@
+<<<<<<< HEAD
 <header>
   <h1>Omoi App</h1>
 </header>
+=======
+<div class="header-container">
+  <ul>
+    <li class="omoi-logo"><a href="">Logo</a></li>
+    <li>
+      <div class="nofy-dropdown">
+        <button (click)="toggleDropdown()">
+          {{ selectedOption || "Notification" }}
+        </button>
+        <ul class="toggle" *ngIf="isDropdownOpen">
+          <li *ngFor="let option of options" (click)="selectOption(option)">
+            {{ option }}
+          </li>
+        </ul>
+      </div>
+    </li>
+    <li><a href="">Post</a></li>
+    <li><a href="">Friend Request</a></li>
+  </ul>
+</div>
+>>>>>>> parent of 883ada5 (added some changes on header components)
