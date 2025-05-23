@@ -1,15 +1,13 @@
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
-import { provideRouter, withHashLocation } from '@angular/router';
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
+
 import { routes } from './app.routes';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { authInterceptor } from './authentication/auth.interceptor';
-import { BrowserModule, provideClientHydration } from '@angular/platform-browser';
+import { provideClientHydration, withNoHttpTransferCache } from '@angular/platform-browser';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    importProvidersFrom(BrowserModule),
-    provideRouter(routes, withHashLocation()),
-    provideHttpClient(withInterceptors([authInterceptor])),
-    provideClientHydration()
-  ],
+    provideZoneChangeDetection({ eventCoalescing: true }), 
+    provideRouter(routes), 
+    provideClientHydration(withNoHttpTransferCache())
+  ]
 };
