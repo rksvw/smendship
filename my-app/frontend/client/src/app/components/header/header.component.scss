@@ -1,3 +1,5 @@
+// Full Size Screen - Desktop
+
 .header {
   width: 100vw;
   padding: 10px 25px;
@@ -66,6 +68,7 @@
         object-fit: cover;
         border: 2px solid #fff;
         border-radius: 100%;
+        cursor: pointer;
       }
 
       span {
@@ -76,7 +79,12 @@
         font-size: 24px;
         font-family: cursive, sans-serif;
         color: #fff;
+        cursor: pointer;
       }
+    }
+
+    .menu-icon {
+      display: none;
     }
 
     .nav {
@@ -97,6 +105,47 @@
       a {
         text-decoration: none;
         color: #fff;
+      }
+    }
+  }
+}
+
+
+// Half Size Screen - Tablet
+
+
+@media screen and (max-width: 1000px) {
+  .header {
+    height: 45px;
+
+    .header-lft {
+      width: 40%;
+
+      .logo {
+        width: 20%;;
+      }
+
+      .search-p_u {
+        flex: 1;
+      }
+    }
+
+
+    .header-rht {
+
+      .nav {
+        display: none;
+      }
+
+      .menu-icon {
+        display: flex;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .menu-icon:hover {
+        rotate: 90deg;
+        transition:  rotate .3s ease-in-out;
       }
     }
   }
