@@ -1,45 +1,40 @@
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { LoginService } from '../../services/login.service';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
 export class LoginComponent {
-  protected email: string = '';
-  protected password: string = '';
-  protected errMsg: string = '';
+  email = '';
+  password = '';
+  errMsg = '';
 
-  protected placeholder = {
-    email: 'hostname@hotmail.com',
-    password: '********',
-  };
-
-  constructor(private loginService: LoginService, private router: Router) {}
+  constructor(
+    private loginService: LoginService,
+    private alertService: AlertService,
+    private router: Router
+  ) {}
 
   onLogin() {
     this.loginService.login(this.email, this.password).subscribe({
-      next: (response) => {
-        const token = response.data?.login?.token;
-        const userId = response.data?.login?.user?.id;
-
+      next: (res) => {
+        const token = res.data?.login?.token;
         if (token) {
           localStorage.setItem('token', token);
-          localStorage.setItem('userId', userId);
-          this.router.navigate(['/'])
+          this.router.navigate(['/']);
         } else {
-          this.errMsg = 'Invalid credentials';
+          this.errMsg = 'Invalid Credentials';
         }
       },
-      error: () => {
-        this.errMsg = 'Login failed. Try again.';
-      }
-    })
+      error: () => this.alertService.showAlert('Login failed. Try again.1'),
+    });
   }
 }

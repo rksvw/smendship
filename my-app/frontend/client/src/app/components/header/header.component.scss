@@ -1,0 +1,152 @@
+// Full Size Screen - Desktop
+
+.header {
+  width: 100vw;
+  padding: 10px 25px;
+  display: flex;
+  align-items: center;
+  height: 58px;
+  justify-content: space-between;
+  background-color: #0b8ec2;
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  .header-lft {
+    width: 30%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    .logo {
+      width: 25%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    img {
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+    }
+
+    .search-p_u {
+      width: 100%;
+      display: flex;
+
+      input {
+        display: flex;
+        flex: 1;
+        padding: 7px 15px;
+        outline: none;
+        border: none;
+        border-radius: 3px;
+      }
+    }
+  }
+
+  .header-rht {
+    width: 45%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    font-size: 18px;
+
+    .user {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+
+      img {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        object-fit: cover;
+        border: 2px solid #fff;
+        border-radius: 100%;
+        cursor: pointer;
+      }
+
+      span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 24px;
+        font-family: cursive, sans-serif;
+        color: #fff;
+        cursor: pointer;
+      }
+    }
+
+    .menu-icon {
+      display: none;
+    }
+
+    .nav {
+      width: 100%;
+      display: flex;
+      justify-content: space-evenly;
+
+      div {
+        width: 45px;
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 100%;
+        background-color: #0da1dbb4;
+      }
+
+      a {
+        text-decoration: none;
+        color: #fff;
+      }
+    }
+  }
+}
+
+
+// Half Size Screen - Tablet
+
+
+@media screen and (max-width: 1000px) {
+  .header {
+    height: 45px;
+
+    .header-lft {
+      width: 40%;
+
+      .logo {
+        width: 20%;;
+      }
+
+      .search-p_u {
+        flex: 1;
+      }
+    }
+
+
+    .header-rht {
+
+      .nav {
+        display: none;
+      }
+
+      .menu-icon {
+        display: flex;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .menu-icon:hover {
+        rotate: 90deg;
+        transition:  rotate .3s ease-in-out;
+      }
+    }
+  }
+}
