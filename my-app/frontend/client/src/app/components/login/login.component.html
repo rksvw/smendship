@@ -1,17 +1,24 @@
 <div class="container">
-  <form #FormName="ngForm" class="form">
+  <h1>[ Login Buddy]</h1>
+  <form (ngSubmit)="onLogin()" class="form">
     <div class="in-email">
       <label for="email">Email</label>
-      <input type="email" name="email" id="" />
+      <input type="email" name="email" id="" [(ngModel)]="email" required />
     </div>
 
     <div class="in-pass">
       <label for="Name">Password</label>
-      <input type="password" name="password" id="" />
+      <input
+        type="password"
+        name="password"
+        id=""
+        [(ngModel)]="password"
+        required
+      />
     </div>
 
     <div class="sign">
-        <span>Don't have an account? </span> <a href="#">SignUp</a>
+      <span>Don't have an account? </span> <a href="#">SignUp</a>
     </div>
 
     <button type="submit" class="submit">Login</button>
