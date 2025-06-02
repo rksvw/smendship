@@ -1,1 +1,31 @@
-<p>signup works!</p>
+<div class="container">
+  <h1>[ SignUp Buddy]</h1>
+  <form (ngSubmit)="onSignup()" class="form">
+     <div class="in-name">
+      <label for="name">Email</label>
+      <input type="text" name="name" id="" [(ngModel)]="name" required />
+    </div>
+
+    <div class="in-email">
+      <label for="email">Email</label>
+      <input type="email" name="email" id="" [(ngModel)]="email" required />
+    </div>
+
+    <div class="in-pass">
+      <label for="Name">Password</label>
+      <input
+        type="password"
+        name="password"
+        id=""
+        [(ngModel)]="password"
+        required
+      />
+    </div>
+
+    <div class="sign">
+      <span>Already have an account? </span> <a href="#">Login</a>
+    </div>
+
+    <button type="submit" class="submit">SignUp</button>
+  </form>
+</div>
