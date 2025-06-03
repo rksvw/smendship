@@ -1,0 +1,49 @@
+.editor {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 8px 5px;
+
+  ._editor {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    background-color: #0da1dbb4;
+    border-radius: 3px;
+    padding: 10px 5px;
+
+    ._editor-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      padding: 5px 10px;
+
+      .user-logo {
+        display: flex;
+
+        img {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 38px;
+          height: 38px;
+          object-fit: cover;
+          border: 2px solid #fff;
+          border-radius: 100%;
+          cursor: pointer;
+        }
+      }
+
+      .tools {
+        display: flex;
+
+        input {
+            display: none;
+        }
+      }
+    }
+  }
+}

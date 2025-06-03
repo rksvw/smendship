@@ -2,10 +2,10 @@
 
 .header {
   width: 100vw;
-  padding: 10px 25px;
+  padding: 0px 113px;
   display: flex;
   align-items: center;
-  height: 58px;
+  height: 60px;
   justify-content: space-between;
   background-color: #0b8ec2;
   position: fixed;
@@ -116,7 +116,7 @@
 
 @media screen and (max-width: 1000px) {
   .header {
-    height: 45px;
+    height: 60px;
 
     .header-lft {
       width: 40%;
