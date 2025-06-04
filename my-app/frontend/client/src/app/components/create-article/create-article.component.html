@@ -32,7 +32,17 @@
       </div>
     </div>
     <div class="_editor-text">
-      <textarea name="" id="" rows="1"></textarea>
+      <textarea
+        #autoGrowTextArea
+        [(ngModel)]="message"
+        (input)="resizeTextarea(autoGrowTextArea)"
+        rows="1"
+        name="message"
+        id="_text-post"
+        placeholder="Type your message..."
+        maxlength="600"
+      ></textarea>
+      <div class="char-count">{{ message.length }}/600</div>
     </div>
     <!-- Optional Preview -->
     <!-- Image Preview List -->
@@ -43,10 +53,13 @@
           *ngFor="let img of images"
           [src]="img"
           alt="Selected"
-          width="150"
+          width="100"
           style="border: 1px solid #ccc; padding: 4px"
         />
       </div>
+    </div>
+    <div class="_editor_post">
+      <button type="submit">Post</button>
     </div>
   </form>
 </div>

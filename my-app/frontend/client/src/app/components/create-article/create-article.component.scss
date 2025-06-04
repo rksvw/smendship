@@ -41,9 +41,71 @@
         display: flex;
 
         input {
-            display: none;
+          display: none;
         }
       }
     }
+
+    ._editor-text {
+      width: 100%;
+      display: flex;
+      padding: 5px 8px;
+      flex-wrap: wrap;
+      position: relative;
+
+      #_text-post {
+        width: 100%;
+        min-height: 40px;
+        max-height: 300px;
+        overflow-y: auto;
+        resize: none;
+        padding: 8px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        line-height: 1.5;
+        box-sizing: border-box;
+        transition: height 0.1s ease;
+
+        /* Add this to fix the breaking issue */
+        // word-wrap: break-word;
+        // overflow-wrap: break-word;
+        // white-space: pre-wrap;
+      }
+      .char-count {
+        text-align: right;
+        font-size: 12px;
+        color: #555;
+        margin-top: 4px;
+      }
+    }
+
+    ._editor_post {
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      padding: 0px 5px 5px 0px;
+    }
+
+    button {
+      background-color: #000;
+      color: #fff;
+      width: 80px;
+      padding: 7px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      outline: none;
+      font-size: 16px;
+      border: none;
+    }
+
+    button:hover {
+      background-color: #fffdfd;
+      color: #000000;
+    }
   }
+
+  // style="border:1px solid #ccc; padding:8px; min-height:50px;"
 }

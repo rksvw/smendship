@@ -17,14 +17,14 @@ import { faImage } from '@fortawesome/free-solid-svg-icons';
 })
 export class CreateArticleComponent {
   faImage = faImage;
-
+  message: string = '';
   images: string[] = [];
 
   onImagePicked(event: Event): void {
     const input = event.target as HTMLInputElement;
 
     if (input.files && input.files.length > 0) {
-      const remainingSlots = 4 - this.images.length;
+      const remainingSlots = 3 - this.images.length;
       const filesToAdd = Array.from(input.files).slice(0, remainingSlots);
 
       for (const file of filesToAdd) {
@@ -43,9 +43,14 @@ export class CreateArticleComponent {
       input.value = '';
 
       if (this.images.length >= 4) {
-        alert('Maximum 4 images allowed.');
+        alert('Maximum 3 images allowed.');
       }
     }
+  }
+
+  resizeTextarea(textarea: HTMLTextAreaElement): void {
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
   }
 }
 
