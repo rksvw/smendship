@@ -1,0 +1,65 @@
+<!-- <p>
+    Start editing to see some magic happen :)
+</p>
+
+<quill-editor #editor [(ngModel)]="content" [modules]="modules" (onContentChanged)="logChange($event);"></quill-editor> -->
+<div class="editor">
+  <form class="_editor">
+    <div class="_editor-visual">
+      <div class="user-logo">
+        <img
+          src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?ga=GA1.1.715019536.1740314747&semt=ais_items_boosted&w=740"
+          alt=""
+        />
+      </div>
+      <div class="tools">
+        <!-- Hidden File Input -->
+        <input
+          type="file"
+          name="image"
+          id="pik-img"
+          accept="image/*"
+          #fileInput
+          (change)="onImagePicked($event)"
+        />
+
+        <!-- Clickable Icon -->
+        <fa-icon
+          [icon]="faImage"
+          (click)="fileInput.click()"
+          style="cursor: pointer"
+        ></fa-icon>
+      </div>
+    </div>
+    <div class="_editor-text">
+      <textarea
+        #autoGrowTextArea
+        [(ngModel)]="message"
+        (input)="resizeTextarea(autoGrowTextArea)"
+        rows="1"
+        name="message"
+        id="_text-post"
+        placeholder="Type your message..."
+        maxlength="600"
+      ></textarea>
+      <div class="char-count">{{ message.length }}/600</div>
+    </div>
+    <!-- Optional Preview -->
+    <!-- Image Preview List -->
+    <div *ngIf="images.length > 0">
+      <h4>Selected Images ({{ images.length }})</h4>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap">
+        <img
+          *ngFor="let img of images"
+          [src]="img"
+          alt="Selected"
+          width="100"
+          style="border: 1px solid #ccc; padding: 4px"
+        />
+      </div>
+    </div>
+    <div class="_editor_post">
+      <button type="submit">Post</button>
+    </div>
+  </form>
+</div>
