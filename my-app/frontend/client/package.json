@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "keywords": ["Facebook", "Clone", "React-Facebook", "Chat", "Message", "Facebook clone", "Friendship Smash Facebook Clone Application"],
+  "author": "Ritik Sharma",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
