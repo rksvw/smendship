@@ -1,5 +1,5 @@
 // File: backend/src/resolvers/index.js
-import bcrypt, { compareSync } from "bcrypt";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import {
   AuthenticationError,
@@ -29,8 +29,7 @@ const resolvers = {
     // Query work like GET
     hello: () => "Hello World! 🌍",
     getNotification: async (_, __, context) => {
-      const userId = getUserIdFromToken(context);
-      if (!userId) throw new AuthenticationError("Unauthorized");
+      const userId = isAuthorizedUserRequest(context);
 
       return await prisma.notification.findMany({
         where: { toUserId: userId },
@@ -38,8 +37,7 @@ const resolvers = {
       });
     },
     getpost: async (_, { id }, context) => {
-      const userId = getUserIdFromToken(context);
-      if (!userId) throw new AuthenticationError("Unauthorized");
+      const userId = isAuthorizedUserRequest(context);
 
       const post = await prisma.post.findUnique({
         where: {
@@ -143,8 +141,7 @@ const resolvers = {
       };
     },
     createpost: async (_, { title, content, category }, context) => {
-      const userId = getUserIdFromToken(context);
-      if (!userId) throw new AuthenticationError("Unauthorized");
+      const userId = isAuthorizedUserRequest(context);
 
       const post = await prisma.post.create({
         data: {
@@ -167,8 +164,7 @@ const resolvers = {
       };
     },
     updatepost: async (_, { id, title, content, category }, context) => {
-      const userId = getUserIdFromToken(context);
-      if (!userId) throw new AuthenticationError("Unauthorized");
+      const userId = isAuthorizedUserRequest(context);
 
       const data = {};
       if (title) {
@@ -191,8 +187,7 @@ const resolvers = {
       };
     },
     deletepost: async (_, { id }, context) => {
-      const userId = getUserIdFromToken(context);
-      if (!userId) throw new AuthenticationError("Unauthorized");
+      const userId = isAuthorizedUserRequest(context);
 
       const post = await prisma.post.delete({
         where: { id },
@@ -203,8 +198,7 @@ const resolvers = {
       };
     },
     likepost: async (_, { postId }, context) => {
-      const userId = getUserIdFromToken(context);
-      if (!userId) throw new AuthenticationError("Unauthorized");
+      const userId = isAuthorizedUserRequest(context);
 
       const token = getToken(context);
       if (!token) throw new AuthenticationError("Priviledged violation!");
@@ -268,8 +262,7 @@ const resolvers = {
       }
     },
     updateprofile: async (_, { name, email }, context) => {
-      const userId = getUserIdFromToken(context);
-      if (!userId) throw new AuthenticationError("Unauthorized");
+      const userId = isAuthorizedUserRequest(context);
 
       const data = {};
 
@@ -295,8 +288,7 @@ const resolvers = {
       };
     },
     deleteuser: async (_, { id }, context) => {
-      const userId = getUserIdFromToken(context);
-      if (!userId) throw new AuthenticationError("Unauthorized");
+      const userId = isAuthorizedUserRequest(context);
 
       const isAdmin = checkIsAdmin(context);
       if (
@@ -317,8 +309,7 @@ const resolvers = {
       };
     },
     createcomment: async (_, { comment, postId }, context) => {
-      const authorId = getUserIdFromToken(context);
-      if (!authorId) throw new AuthenticationError("Unauthorized");
+      const authorId = isAuthorizedUserRequest(context);
 
       const token = getToken(context);
       if (!token) throw new AuthenticationError("Priviledged violation!");
@@ -333,8 +324,7 @@ const resolvers = {
       };
     },
     updatecomment: async (_, { comment, id }, context) => {
-      const authorId = getUserIdFromToken(context);
-      if (!authorId) throw new AuthenticationError("Unauthorized");
+      const authorId = isAuthorizedUserRequest(context);
 
       const token = getToken(context);
       if (!token) throw new AuthenticationError("Priveledged violation!");
@@ -354,8 +344,7 @@ const resolvers = {
       };
     },
     deletecomment: async (_, { id }, context) => {
-      const authorId = getUserIdFromToken(context);
-      if (!authorId) throw new AuthenticationError("Unauthorized");
+      const authorId = isAuthorizedUserRequest(context);
 
       const token = getToken(context);
       if (!token) throw new AuthenticationError("Priveledged violation!");
@@ -369,8 +358,7 @@ const resolvers = {
       };
     },
     likecomment: async (_, { postId, commentId }, context) => {
-      const userId = getUserIdFromToken(context);
-      if (!userId) throw new AuthenticationError("Unauthorized");
+      const userId = isAuthorizedUserRequest(context);
 
       try {
         const existing = await prisma.commentLike.findUnique({
@@ -431,8 +419,7 @@ const resolvers = {
       }
     },
     friendSendRequest: async (_, { receiverId }, context) => {
-      const senderId = getUserIdFromToken(context);
-      if (!senderId) throw new AuthenticationError("Unauthorized");
+      const senderId = isAuthorizedUserRequest(context);
 
       const req = await prisma.friendRequest.create({
         data: { senderId, receiverId, type: "FRIEND_REQUEST_SENT" },
@@ -508,8 +495,7 @@ const resolvers = {
     },
 
     activateChatRoom: async (_, { targetUserId }, context) => {
-      const userId = getUserIdFromToken(context);
-      if (!userId) throw new AuthenticationError("Unauthorized");
+      const userId = isAuthorizedUserRequest(context);
 
       const isChatRoomExist = await prisma.chatRoom.findFirst({
         where: {
@@ -589,8 +575,7 @@ const resolvers = {
       };
     },
     textMessage: async (_, { chatRoomId, content }, context) => {
-      const userId = getUserIdFromToken(context);
-      if (!userId) throw new AuthenticationError("Unauthorized");
+      const userId = isAuthorizedUserRequest(context);
 
       const msg = await prisma.message.create({
         data: {
@@ -615,8 +600,7 @@ const resolvers = {
       };
     },
     iNotify: async (_, { id }, context) => {
-      const userId = getUserIdFromToken(context);
-      if (!userId) throw new AuthenticationError("Unauthorized");
+      const userId = isAuthorizedUserRequest(context);
 
       const notify = await prisma.notification.findUnique({
         where: { id },
@@ -696,6 +680,13 @@ async function createNotification({
   });
 
   return notify;
+}
+
+function isAuthorizedUserRequest(context) {
+  const userId = getUserIdFromToken(context);
+  if (!userId) throw new AuthenticationError("Unauthorized");
+
+  return userId;
 }
 
 async function updateNotification({
