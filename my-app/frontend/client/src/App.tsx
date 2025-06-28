@@ -1,11 +1,12 @@
 import './App.css'
+import LoginComponent from './components/Auth/LoginComponent'
 
 function App() {
 
   return (
     <>
       <div>
-        <h1>Hello world</h1>
+        <LoginComponent />
         </div>
     </>
   )
