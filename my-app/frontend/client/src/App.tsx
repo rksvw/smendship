@@ -2,6 +2,7 @@ import './App.css'
 import LoginComponent from './components/Auth/LoginComponent'
 import {Route, Routes} from "react-router-dom"
 import SignupComponent from './components/Auth/SignupComponent'
+import IndexPage from './pages/IndexPage'
 
 function App() {
 
@@ -9,8 +10,9 @@ function App() {
     <>
       <div>
         <Routes>
-          <Route path='login' element={<LoginComponent />} />
-          <Route path='signup' element={<SignupComponent />} />
+          <Route path='auth/login' element={<LoginComponent />} />
+          <Route path='auth/signup' element={<SignupComponent />} />
+          <Route path='' element={<IndexPage />} />
         </Routes>
         </div>
     </>

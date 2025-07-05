@@ -1,0 +1,72 @@
+header {
+  padding: 7px 0px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "sans-serif";
+}
+
+header ._logo {
+  color: #fff;
+}
+
+header ._profile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+header ._profile ._pic {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+header ._profile ._pic img {
+  width: 45px;
+}
+
+header ._profile .handle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-left: 1.5px solid #fff;
+  padding: 15px;
+  line-height: 10px;
+}
+
+header ._profile .handle strong {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: rgb(216, 216, 216);
+  margin-bottom: 6px;
+}
+
+header ._profile .handle span {
+  font-size: 0.8rem;
+}
+
+header nav {
+  display: flex;
+  width: 40%;
+}
+
+header nav ul {
+  display: flex;
+  width: 100%;
+  justify-content: space-evenly;
+  list-style: none;
+}
+
+
+header nav ul li {
+    width: 35px;
+    height: 35px;
+    border-radius: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center ;
+    background-color: #fff;
+}
