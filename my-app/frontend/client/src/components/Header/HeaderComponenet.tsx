@@ -1,40 +1,41 @@
 import { Component } from "react";
-import { FaHome, FaFacebookMessenger, FaBell, FaSearch } from "react-icons/fa";
+import { FaHome, FaFacebookMessenger, FaBell } from "react-icons/fa";
 import img from "../../assets/icons8-user-default-100.png";
 import "./Header.css";
+import { MdExplore } from "react-icons/md";
 
 export default class HeaderComponenet extends Component {
   render() {
     return (
-      <header className="header">
-        <div className="_logo">
-          <h2>#Facebook</h2>
+      <header className="flex justify-around w-full h-16 items-center">
+        <div id="logo" className="text-3xl w-2/5 font-semibold border-r-2 border-blue-950">
+          #Smendship
         </div>
-        <div className="_profile">
-          <div className="_pic">
-            <img src={img} alt="Profile" />
+        <div
+          id="nav"
+          className="flex self-center justify-between h-14 w-[800px] items-center bg-blue-950 rounded-full"
+        >
+          <div id="profile" className="flex w-14 justify-center items-center ">
+            <div id="img" className="cursor-pointer hover:w-13 w-12">
+              <img src={img} alt="default" />
+            </div>
           </div>
-          <div className="handle">
-            <strong>Ritik Sharma</strong>
-            <span>@ritik</span>
+          <div
+            id="Home"
+            className="icons"
+          >
+            <FaHome />
+          </div>
+          <div id="chat" className="icons">
+            <FaFacebookMessenger />
+          </div>
+          <div id="notify" className="icons">
+            <FaBell />
+          </div>
+          <div id="explore" className="icons mr-2!">
+            <MdExplore />
           </div>
         </div>
-        <nav className="_nav">
-          <ul>
-            <li>
-              <FaHome />
-            </li>
-            <li>
-              <FaFacebookMessenger />
-            </li>
-            <li>
-              <FaBell />
-            </li>
-            <li>
-              <FaSearch />
-            </li>
-          </ul>
-        </nav>
       </header>
     );
   }
