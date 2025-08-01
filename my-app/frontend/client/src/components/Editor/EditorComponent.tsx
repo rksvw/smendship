@@ -1,11 +1,9 @@
 import { useRef } from "react";
 
 export default function EditorComponent() {
-  const imageRefs = useRef("");
+  const imageRefs = useRef(null);
 
-  const handleImage = () => {
-
-  }
+  const handleImage = () => {};
 
   return (
     <>
@@ -21,7 +19,7 @@ export default function EditorComponent() {
             name="images"
             id="toolbar-image"
             ref={imageRefs}
-            style={{display: "none"}}
+            style={{ display: "none" }}
           />
         </div>
         <textarea
