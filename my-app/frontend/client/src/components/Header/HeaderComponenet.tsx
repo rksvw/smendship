@@ -9,7 +9,7 @@ export default class HeaderComponenet extends Component {
     return (
       <header className="flex justify-around w-full h-16 items-center">
         <div id="logo" className="text-3xl w-2/5 font-semibold border-r-2 border-blue-950">
-          #Smendship
+          #Swormp
         </div>
         <div
           id="nav"

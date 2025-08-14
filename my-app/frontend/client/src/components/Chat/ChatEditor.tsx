@@ -24,7 +24,7 @@ export default function ChatEditor() {
         rows={1}
         value={text}
         onChange={handleChange}
-        className="w-full p-2 text-base leading-5 rounded-lg border border-gray-300 focus:outline-none resize-none overflow-hidden transition-all"
+        className="w-full p-2! text-base leading-5 rounded-lg focus:border focus:border-gray-300 focus:outline-none resize-none overflow-hidden transition-all"
         placeholder="Type a message..."
       ></textarea>
     </div>
