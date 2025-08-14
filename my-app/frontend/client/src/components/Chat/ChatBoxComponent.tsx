@@ -9,6 +9,7 @@ export default function ChatBoxComponent() {
       </div>
       <div className="flex justify-around w-fullitems-center">
         <div className=" w-2/5">
+          <h2 className="text-2xl font-bold">Made with ❤️ by Ritik Sharma</h2>
           <p>Working!</p>
         </div>
         <div className="flex w-[800px]  h-full justify-center items-center">
