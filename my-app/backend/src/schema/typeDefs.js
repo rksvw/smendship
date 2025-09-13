@@ -71,6 +71,12 @@ const typeDefs = gql`
     user: User!
   }
 
+  type ChatUserList {
+    id: String!
+    userId: String!
+    chatRoomId: String!
+  }
+
   type PostPayload {
     post: Post!
   }
@@ -131,6 +137,7 @@ const typeDefs = gql`
     friendSendRequest(receiverId: String!): FriendRequestPayload
     friendAcceptRequest(requestId: String!): FriendRequestPayload
 
+    friendChatList(userId: String!): [ChatUserList]
     activateChatRoom(targetUserId: String!): ChatRoom!
     textMessage(chatRoomId: String!, content: String!): Message!
 

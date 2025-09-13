@@ -572,6 +572,22 @@ const resolvers = {
         isGroup: startChatRoom.isGroup,
       };
     },
+
+    friendChatList: async (_, { userIdL }, context) => {
+
+      const chatRoomList = await prisma.participant.findMany({
+        where: { userId: userIdL },
+      });
+
+      console.log("Get the List of ChatroomId");
+
+      console.log("List: ", chatRoomList);
+
+      return {
+        chatRoomList,
+      };
+    },
+
     textMessage: async (_, { chatRoomId, content }, context) => {
       const userId = isAuthorizedUserRequest(context);
 
@@ -644,8 +660,10 @@ function getToken(context) {
 
 function getUserIdFromToken(context) {
   const token = context.token;
+  console.log(token);
   try {
     const verifiedToken = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(verifiedToken);
     return verifiedToken.userId;
   } catch (err) {
     return null;

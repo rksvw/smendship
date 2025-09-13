@@ -4,6 +4,7 @@ import { Route, Routes } from "react-router-dom";
 import SignupComponent from "./components/Auth/SignupComponent";
 import IndexPage from "./pages/IndexPage";
 import ChatBoxComponent from "./components/Chat/ChatBoxComponent";
+import UsersChatList from "./components/Chat/UsersChatList";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="auth/signup" element={<SignupComponent />} />
           <Route path="" element={<IndexPage />} />
           <Route path="chat" element={<ChatBoxComponent />} />
+          <Route path="chat/user/list" element={<UsersChatList />} />
         </Routes>
       </div>
     </>
