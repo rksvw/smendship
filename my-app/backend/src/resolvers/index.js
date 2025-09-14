@@ -26,6 +26,7 @@ const resolvers = {
         : null,
   },
   Query: {
+    // Query work like GET
     hello: () => "Hello World! 🌍",
     getNotification: async (_, __, context) => {
       const userId = isAuthorizedUserRequest(context);
@@ -65,6 +66,7 @@ const resolvers = {
   },
   Mutation: {
     // Mutation is like a router for GraphQL
+    // And mutation work like POST
     signup: async (_, { name, email, password }) => {
       if (
         !name ||
@@ -572,22 +574,6 @@ const resolvers = {
         isGroup: startChatRoom.isGroup,
       };
     },
-
-    friendChatList: async (_, { userIdL }, context) => {
-
-      const chatRoomList = await prisma.participant.findMany({
-        where: { userId: userIdL },
-      });
-
-      console.log("Get the List of ChatroomId");
-
-      console.log("List: ", chatRoomList);
-
-      return {
-        chatRoomList,
-      };
-    },
-
     textMessage: async (_, { chatRoomId, content }, context) => {
       const userId = isAuthorizedUserRequest(context);
 
