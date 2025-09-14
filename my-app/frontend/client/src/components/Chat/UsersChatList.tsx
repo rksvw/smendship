@@ -1,8 +1,51 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 function UsersChatList() {
+  useEffect(() => {
+    getFriendChatList();
+  }, []);
 
+  const baseUrl = "http://localhost:4000/graphql";
 
+  const userId = "f3782525-c95f-435e-9517-3f21c25e4528";
+
+  const getFriendChatList = () => {
+    const getList = async () => {
+      const res = await fetch(baseUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query: `
+          query FriendChatList($userId: String!) {
+            friendChatList(userId: $String!) {
+              chatRoom {
+                id
+              }
+              user {
+                id
+              }
+              id
+            }
+          }
+        `,
+          variables: { userId: userId },
+        }),
+      });
+
+      const result = await res.json();
+
+      if (result.errors) {
+        console.log("Client Error");
+      } else {
+        console.log(result.data);
+      }
+    };
+
+    getList();
+  };
 
   return (
     <div className="flex flex-col mx-20!">
