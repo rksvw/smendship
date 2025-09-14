@@ -103,6 +103,7 @@ const typeDefs = gql`
     getpost(id: String!): PostPayload
     getcomments(postId: String!): CommentsPayload
     getNotification: [Notification!]!
+    friendChatList(userId: String!): [Participant!]!
   }
 
   type Mutation {
