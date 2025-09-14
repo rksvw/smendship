@@ -76,7 +76,10 @@ const typeDefs = gql`
   }
 
   type Message {
-    message: String
+    id: String!
+    content: String!
+    sender: User!
+    chatRoom: ChatRoom!
   }
 
   type FriendRequestPayload {
@@ -104,6 +107,7 @@ const typeDefs = gql`
     getcomments(postId: String!): CommentsPayload
     getNotification: [Notification!]!
     friendChatList(userId: String!): [Participant!]!
+    chatRoomChatList(chatRoomId: String): [Message!]!
   }
 
   type Mutation {

@@ -65,7 +65,24 @@ const resolvers = {
         mycomment,
       };
     },
+    chatRoomChatList: async (_, { chatRoomId }, context) => {
+      const token = getToken(context);
+      if (!token) throw new AuthenticationError("Unauthorized");
 
+      const chatMsgList = await prisma.message.findMany({
+        where: { chatRoomId },
+        include: {
+          chatRoom: true,
+          sender: true,
+        },
+      });
+
+      console.log("List of chat-msg ", Array.isArray(chatMsgList));
+
+      console.log("List ", chatMsgList);
+
+      return chatMsgList;
+    },
     friendChatList: async (_, { userId }, context) => {
       const token = getToken(context);
       if (!token) throw new AuthenticationError("Unauthorized");
