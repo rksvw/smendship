@@ -112,13 +112,7 @@ const typeDefs = gql`
     getpost(id: String!): PostPayload
     getcomments(postId: String!): CommentsPayload
     getNotification: [Notification!]!
-
-
     friendChatList(userId: String!): [Friendship!]!
-
-    friendChatList(userId: String!): [Participant!]!
-
-    friendChatList(userId: String!): [Participant!]!
     chatRoomChatList(chatRoomId: String): [Message!]!
   }
 
