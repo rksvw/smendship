@@ -84,6 +84,17 @@ const resolvers = {
       return chatMsgList;
     },
     friendChatList: async (_, { userId }, context) => {
+
+      // const token = getToken(context);
+      // if (!token) throw new AuthenticationError("Unauthorized");
+
+      const friendList = await prisma.friendship.findMany({
+        where: { OR: [{ user1Id: userId }, { user2Id: userId }] },
+        include: {
+          user1: true,
+          user2: true,
+        }
+
       const token = getToken(context);
       if (!token) throw new AuthenticationError("Unauthorized");
 
@@ -93,10 +104,20 @@ const resolvers = {
           user: true,
           chatRoom: true,
         },
+
       });
 
       console.log(
         "Get the List of ChatroomId is Array ",
+
+        Array.isArray(friendList)
+      );
+
+      console.log("List: ", friendList);
+
+      return friendList;
+
+
         Array.isArray(chatRoomList)
       );
 
