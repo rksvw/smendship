@@ -114,6 +114,7 @@ const typeDefs = gql`
     getNotification: [Notification!]!
     friendChatList(userId: String!): [Friendship!]!
     chatRoomChatList(chatRoomId: String): [Message!]!
+    userChatRoomId(userId: String!): [Participant!]!
   }
 
   type Mutation {

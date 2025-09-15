@@ -5,8 +5,8 @@ export default function ChatComponent({chatUserId}) {
 
   const baseUrl = "http://localhost:4000/graphql";
 
-  const handleChatMsg = () => {
-    const requestMsg = async () => {
+  const chatRoomExist = () => {
+    const chkChatRoomExitence = async () => {
       const res = await fetch(baseUrl, {
         method: "POST",
         headers: {
@@ -14,11 +14,11 @@ export default function ChatComponent({chatUserId}) {
         },
         body: JSON.stringify({
           query: `
-          query($userId: String!) {
+          mutation ($userId: String!) {
 
           }
           `
-          ,variables: {}
+          ,variables: {userId: chatUserId}
         })
       })
     }

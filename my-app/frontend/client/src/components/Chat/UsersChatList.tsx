@@ -4,14 +4,14 @@ import { Link } from "react-router-dom";
 function UsersChatList({ setChatUserId }) {
   const [chatUser, setChatUser] = useState([]);
   useEffect(() => {
-    getFriendChatList();
+    getFriendList();
   }, []);
 
   const baseUrl = "http://localhost:4000/graphql";
 
   const userId = "f3782525-c95f-435e-9517-3f21c25e4528";
 
-  const getFriendChatList = () => {
+  const getFriendList = () => {
     const getList = async () => {
       const res = await fetch(baseUrl, {
         method: "POST",
